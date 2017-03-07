@@ -64,13 +64,43 @@ def get_signal_value(sensor_rssi):
     return str(sensor_rssi)
 
 ########################################################################################################################
+########################################################################################################################
+########################################################################################################################
+########################################################################################################################
+########################################################################################################################
 
-if 1==1:
+############### Nastavime parametry pomoci argumentu prikazoveho radku #################################################
+used_port = used_mode = demo_run = ""
+myopts, args = getopt.getopt(sys.argv[1:], "o:a:")
+for o, a in myopts:
+    if o == '-h' or o == '-help':
+        print('=============================================================================================================')
+        print('= Python script used for reading WmBUS telegrams with IQRF module implanted on UniPi module for RaspberryPi =')
+        print('=============================================================================================================')
+        print('= General usage of the script:                                                                              =')
+        print('=      MainApplication.py                                                                                   =')
+        print('= Modified run of the script:                                                                               =')
+        print('=      MainApplication.py -p <serial_port> -r <WmBus_mode>  -a <aes_key>                                    =')
+        print('= Demo or testing purposes:                                                                                 =')
+        print('=      MainApplication.py -d                                                                                =')
+        print('= Display this help                                                                                         =')
+        print('=      MainApplication.py -h                                                                                =')
+        print('=============================================================================================================')
+        sys.exit()
+    if o == '-d':
+        demo_run = True
+        break
+    elif o == '-p':
+        used_port = a
+    elif o == '-r':
+        used_mode = a
+    else o == '-r':
+        used_aes = a
+
+if (demo_run==True):
     words = get_demo_telegrams()
 else:
-    words = ''
-
-
+    words = ""
 
 wordLed = len(words)
 for i in range(0, wordLed):
@@ -93,10 +123,5 @@ for i in range(0, wordLed):
     if parsedstring[66:68] == "01": errors = "Vybita baterie"
 
     print(time.strftime("%H:%M:%S %d/%m/%Y") + "    Mereni: " + increment + "   Senzor: " + sensor_manu + "." + sensor_type + "." + sensor_sn + "." + sensor_ver + "    RSSI: " + get_signal_value(rssi) + "dB    Teplota: " + temperature + "C    Vlhkost: " + humidity + "%")
-
-conn = sqlite3.connect('MainDatabase.db')
-print("Opened database successfully")
-
-conn.close()
 
 

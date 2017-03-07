@@ -5,6 +5,8 @@ import sqlite3
 #import serial
 #import os
 import sys, getopt
+import struct
+
 
 ############### Vypocitani VendorID z M-Pole ###########################################################################
 
@@ -58,10 +60,9 @@ def get_demo_telegrams():
 ############### Vypocitani RSSI v dBm z (-3,-4) ########################################################################
 
 def get_signal_value(sensor_rssi):
-    #print(sensor_rssi)
     sensor_rssi = int(sensor_rssi, 16)
     sensor_rssi = (sensor_rssi/2)-130
-    return str(sensor_rssi)
+    return str(sensor_rssi).rjust(6,' ')
 
 ########################################################################################################################
 ########################################################################################################################
@@ -94,17 +95,22 @@ for o, a in myopts:
         used_port = a
     elif o == '-r':
         used_mode = a
-    else o == '-r':
+    elif o == '-r':
         used_aes = a
 
+############### Stanoveni jestli jsem v demo rezimu nebo parsuji prichozi telegramy ####################################
 if (demo_run==True):
     words = get_demo_telegrams()
 else:
-    words = ""
+    words = get_demo_telegrams()
 
+############### Zacneme prochazet co mame k dispozici ##################################################################
 wordLed = len(words)
+errors = ''
 for i in range(0, wordLed):
+    errors = ''
     parsedstring = str(words[i])
+
     sensor_sn = parsedstring[18:20] + parsedstring[16:18] + parsedstring[14:16] + parsedstring[12:14]
     sensor_ver = parsedstring[20:22]
     sensor_type = parsedstring[22:24]
@@ -112,16 +118,29 @@ for i in range(0, wordLed):
 
     increment = parsedstring[26:28]
 
-    #rssi = get_signal_value(parsedstring[-2:0])
-    rssi = "00"
+    rssi = get_signal_value(parsedstring[-4:-2])
 
-    temperature = parsedstring[44:45].replace("0", "") + parsedstring[45:46].replace("0", "") + parsedstring[42:43] + "." + parsedstring[43:44]
-    humidity = parsedstring[54:55].replace("0", "") + parsedstring[55:56].replace("0", "") + parsedstring[52:53] + "." + parsedstring[53:54]
-
-
-    if parsedstring[64:66] == "01": errors = "Sabotaz cidla"
-    if parsedstring[66:68] == "01": errors = "Vybita baterie"
-
-    print(time.strftime("%H:%M:%S %d/%m/%Y") + "    Mereni: " + increment + "   Senzor: " + sensor_manu + "." + sensor_type + "." + sensor_sn + "." + sensor_ver + "    RSSI: " + get_signal_value(rssi) + "dB    Teplota: " + temperature + "C    Vlhkost: " + humidity + "%")
+    configuration_field = parsedstring[33:34]
+    if (configuration_field=='5'):
+        aes = True
+    else:
+        aes = False
 
 
+
+    if (sensor_manu=="WEP"):
+        if parsedstring[66:68] == "01": errors = "Vybita baterie"
+        temperature = parsedstring[44:45].replace("0", "") + parsedstring[45:46].replace("0", "") + parsedstring[42:43] + "." + parsedstring[43:44]
+        humidity = parsedstring[54:55].replace("0", "") + parsedstring[55:56].replace("0", "") + parsedstring[52:53] + "." + parsedstring[53:54]
+    elif (sensor_manu=="BON"):
+        temperature = humidity = "11.1"
+    elif (sensor_manu == "KAM"):
+        temperature = humidity = "22.2"
+    elif (sensor_manu == "ZPA"):
+        temperature = humidity = "33.3"
+    elif (sensor_manu == "PIK"):
+        temperature = humidity = "44.4"
+    else:
+        break;
+
+    print(time.strftime("%H:%M:%S %d/%m/%Y") + "    Mereni: " + increment + "  Senzor: " + sensor_manu + "." + sensor_type + "." + sensor_sn + "." + sensor_ver + "    RSSI: " + rssi + "dB     AES: " + str(aes).ljust(5,' ') + "   Teplota: " + temperature.rjust(5,' ') + "C    Vlhkost: " + humidity.rjust(5,' ') + "%     " + errors)

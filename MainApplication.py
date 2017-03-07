@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
 import binascii
 import time
 import sqlite3
@@ -143,4 +144,4 @@ for i in range(0, wordLed):
     else:
         break;
 
-    print(time.strftime("%H:%M:%S %d/%m/%Y") + "    Mereni: " + increment + "  Senzor: " + sensor_manu + "." + sensor_type + "." + sensor_sn + "." + sensor_ver + "    RSSI: " + rssi + "dB     AES: " + str(aes).ljust(5,' ') + "   Teplota: " + temperature.rjust(5,' ') + "C    Vlhkost: " + humidity.rjust(5,' ') + "%     " + errors)
+    print(time.strftime("%H:%M:%S %d/%m/%Y") + "    Mereni: " + increment + "  Senzor: " + sensor_manu + "." + sensor_type + "." + sensor_sn + "." + sensor_ver + "    RSSI: " + rssi + "dB     AES: " + str(aes).ljust(5,' ') + "   Teplota: " + temperature.rjust(5,' ') + "°C    Vlhkost: " + humidity.rjust(5,' ') + "%     " + errors)

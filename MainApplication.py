@@ -46,7 +46,7 @@ def get_demo_telegrams():
     words.append(
         "32002e44b05c10000000021b7a660800002f2f0a6690010afb1a090302fd971d01002f2f2f2f2f2f2f2f2f2f2f2f2f2f2f8769")  # ME
     # BONEGA AES
-    words.append("22001E44EE092101000001067A4F0010051AB94C4FDA694309E347E86FA437790C1234")  # KZ
+    words.append("22001E44EE092101000001067A4F0010051AB94C4FDA694309E347E86FA437790C6ED5")  # KZ
     # words.append("22001E44EE092101000001077A43001005C8C16D2F1F1DBDD884515FC9E4905B357C9C")  # ME
     # words.append("22001E44EE092101000001067A430010051DBBA0F32262EBC81D9AF8F70CB8FB7E6ED5")  # ME
     # words.append("22001E44EE092101000001077A44001005D3CCF20F690F2A9F3E6C6DC5CC32429F760C")  # ME
@@ -139,7 +139,7 @@ for i in range(0, wordLed):
     sensor_type = parsedstring[22:24]
     sensor_manu = get_vendor_name(parsedstring[8:12])
 
-    increment = str(int(parsedstring[26:28],16)).rjust(3,' ')
+    increment = str(int(parsedstring[26:28], 16)).rjust(3, ' ')
 
     rssi = get_signal_value(parsedstring[-4:-2])
 
@@ -170,17 +170,18 @@ for i in range(0, wordLed):
         TELEGRAM_ORIGINAL = encryptor_new.decrypt(TELEGRAM_CRYPTED)
 
         # Pro kontrolu to vypiseme
-        #print(binascii.hexlify(TELEGRAM_DECRYPTED).upper())
-        #print(binascii.hexlify(TELEGRAM_CRYPTED).upper())
-        #print(binascii.hexlify(TELEGRAM_ORIGINAL).upper())
+        # print(binascii.hexlify(TELEGRAM_DECRYPTED).upper())
+        # print(binascii.hexlify(TELEGRAM_CRYPTED).upper())
+        # print(binascii.hexlify(TELEGRAM_ORIGINAL).upper())
 
         aes_control = binascii.hexlify(TELEGRAM_ORIGINAL[0:2]).upper()
         if (aes_control != b'2F2F'):
             print("Chyba desifrovani paketu " + str(binascii.hexlify(TELEGRAM_DECRYPTED).upper()) + "!")
             continue
         else:
-            parsedstring =  parsedstring[0:34] + str(binascii.hexlify(TELEGRAM_ORIGINAL).upper().decode('ascii')) +  parsedstring[-4:]
-            #print(parsedstring)
+            parsedstring = parsedstring[0:34] + str(
+                binascii.hexlify(TELEGRAM_ORIGINAL).upper().decode('ascii')) + parsedstring[-4:]
+            # print(parsedstring)
 
     else:
         aes = False
@@ -195,15 +196,29 @@ for i in range(0, wordLed):
                                                                                                  52:53] + "." + parsedstring[
                                                                                                                 53:54]
         print(time.strftime(
-        "%H:%M:%S %d/%m/%Y") + "    Mereni: " + increment + "  Senzor: " + sensor_manu + "." + sensor_type + "." + sensor_sn + "." + sensor_ver + "    RSSI: " + rssi + "dB     AES: " + str(
-        aes).ljust(5, ' ') + "   Teplota: " + temperature.rjust(5, ' ') + "°C    Vlhkost: " + humidity.rjust(5,
-                                                                                                             ' ') + "%     " + errors)
+            "%H:%M:%S %d/%m/%Y") + "    Mereni: " + increment + "  Senzor: " + sensor_manu + "." + sensor_type + "." + sensor_sn + "." + sensor_ver + "    RSSI: " + rssi + "dB     AES: " + str(
+            aes).ljust(5, ' ') + "   Teplota: " + temperature.rjust(5, ' ') + "°C    Vlhkost: " + humidity.rjust(5,
+                                                                                                                 ' ') + "%     " + errors)
     elif (sensor_manu == "BON"):
         counter = parsedstring[48:50] + parsedstring[46:48] + parsedstring[44:46] + parsedstring[42:44]
         counter = str(int(counter, 16))
+
+        bontime = str(bin(int(parsedstring[54:56], 16))[2:]).zfill(8)+str(bin(int(parsedstring[56:58], 16))[2:]).zfill(8)
+        bondate = str(bin(int(parsedstring[58:60], 16))[2:]).zfill(8)+str(bin(int(parsedstring[60:62], 16))[2:]).zfill(8)
+        minutes = str(int(bontime[2:8],2))
+        hours = str(int(bontime[11:16],2))
+        year1 = str(int(bondate[0:3],2))
+        year2 = str(int(bondate[8:12],2))
+        day = str(int(bondate[3:8],2))
+        month = str(int(bondate[12:16],2))
+        cascteni = hours + ":"+ minutes.zfill(2) + " " + day + "." + month + ".20" + year2 + year1
+
+
+
+
         print(time.strftime(
-        "%H:%M:%S %d/%m/%Y") + "    Mereni: " + increment + "  Senzor: " + sensor_manu + "." + sensor_type + "." + sensor_sn + "." + sensor_ver + "    RSSI: " + rssi + "dB     AES: " + str(
-        aes).ljust(5, ' ') + "   Citac: " + counter.rjust(8, ' ') + "l            " + errors)
+            "%H:%M:%S %d/%m/%Y") + "    Mereni: " + increment + "  Senzor: " + sensor_manu + "." + sensor_type + "." + sensor_sn + "." + sensor_ver + "    RSSI: " + rssi + "dB     AES: " + str(
+            aes).ljust(5, ' ') + "   Průtok: " + counter.rjust(7, ' ') + "l    Cas: " + cascteni + errors)
     elif (sensor_manu == "KAM"):
         temperature = humidity = "22.2"
     elif (sensor_manu == "ZPA"):
@@ -213,6 +228,4 @@ for i in range(0, wordLed):
     else:
         break;
 
-    ############ Vypiseme na screen ##############################################################################
-
-
+        ############ Vypiseme na screen ##############################################################################

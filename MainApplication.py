@@ -41,10 +41,8 @@ def get_demo_telegrams():
     # words.append("32002E44B05C10000000021B7A2C0820051D2B70A744ACD71B237CF8F6C54C1A7A2E0DE2F24C9225E4BB0FB278C8A68CF77985")  # ME
     # words.append("32002E44B05C10000000021B7A2D0820058FBFB2CE35F67F9F66E00E751BBBF5271E07F63C09BBAA77CDA574D6A0D672477C6E")  # ME
     # WEPTECH CLEAN
-    words.append(
-        "32002E44B05C11000000021B7A920800002F2F0A6667020AFB1A560402FD971D01002F2F2F2F2F2F2F2F2F2F2F2F2F2F2F1234")  # KZ
-    words.append(
-        "32002e44b05c10000000021b7a660800002f2f0a6690010afb1a090302fd971d01002f2f2f2f2f2f2f2f2f2f2f2f2f2f2f8769")  # ME
+    words.append("32002E44B05C11000000021B7A920800002F2F0A6667020AFB1A560402FD971D01002F2F2F2F2F2F2F2F2F2F2F2F2F2F2F1234")  # KZ
+    words.append("32002e44b05c10000000021b7a660800002f2f0a6690010afb1a090302fd971d01002f2f2f2f2f2f2f2f2f2f2f2f2f2f2f8769")  # ME
     # BONEGA AES
     words.append("22001E44EE092101000001067A4F0010051AB94C4FDA694309E347E86FA437790C6ED5")  # KZ
     # words.append("22001E44EE092101000001077A43001005C8C16D2F1F1DBDD884515FC9E4905B357C9C")  # ME
@@ -57,12 +55,8 @@ def get_demo_telegrams():
     # ZPA
     words.append("00002A44016A4493671201027244936712016A01020000002086108300762385010000862083009731920000001234")  # KZ
     words.append("2e002a44016a4742750101027247427501016a01021b00002086108300b80b0000000086208300f82a000000008cd4")  # JA
-    words.append("2e002a44016a4742750101027247427501016a01021c00002086108300b80b0000000086208300f82a000000008cd3")  # JA
-    words.append("2e002a44016a4742750101027247427501016a01021d00002086108300b80b0000000086208300f82a000000008cd2")  # JA
-    # PIKKERTON
-    # words.append("000028442B414452127002027A3500000004FB2CCDC3000001FD49E002FD591A01022B200004035C0000001234")  # KZ
     # TECHEM
-    # words.append("000032446850633481346980A0919F1DF800D0282901600CAE0C152000343A392328060000000000000000000000000000000000001234")  # KZ
+    words.append("000032446850633481346980A0919F1DF800D0282901600CAE0C152000343A392328060000000000000000000000000000000000001234")  # KZ
     return words
 
 
@@ -205,7 +199,6 @@ for i in range(0, wordLed):
     elif (sensor_manu == "BON"):
         counter = parsedstring[48:50] + parsedstring[46:48] + parsedstring[44:46] + parsedstring[42:44]
         counter = str(int(counter, 16))
-
         bontime = str(bin(int(parsedstring[54:56], 16))[2:]).zfill(8)+str(bin(int(parsedstring[56:58], 16))[2:]).zfill(8)
         bondate = str(bin(int(parsedstring[58:60], 16))[2:]).zfill(8)+str(bin(int(parsedstring[60:62], 16))[2:]).zfill(8)
         minutes = str(int(bontime[2:8],2))
@@ -215,10 +208,6 @@ for i in range(0, wordLed):
         day = str(int(bondate[3:8],2))
         month = str(int(bondate[12:16],2))
         cascteni = hours + ":"+ minutes.zfill(2) + " " + day + "." + month + ".20" + year2 + year1
-
-
-
-
         print(time.strftime(
             "%H:%M:%S %d/%m/%Y") + "    Mereni: " + increment + "  Senzor: " + sensor_manu + "." + sensor_type + "." + sensor_sn + "." + sensor_ver + "    RSSI: " + rssi + "dB     AES: " + str(
             aes).ljust(5, ' ') + "   Průtok: " + counter.rjust(7, ' ') + "l    Cas: " + cascteni + errors)
@@ -231,6 +220,8 @@ for i in range(0, wordLed):
             "%H:%M:%S %d/%m/%Y") + "    Mereni: " + increment + "  Senzor: " + sensor_manu + "." + sensor_type + "." + sensor_sn + "." + sensor_ver + "    RSSI: " + rssi + "dB     AES: " + str(
             aes).ljust(5, ' ') + "   Hodnota1: " + value1 + "   Hodnota2: " + value2 + errors)
     else:
+        print(time.strftime("%H:%M:%S %d/%m/%Y") + "    Mereni: " + increment + "  Senzor: " + sensor_manu + "." + sensor_type + "." + sensor_sn + "." + sensor_ver + "    RSSI: " + rssi + "dB     AES: " + str(
+            aes).ljust(5, ' ') + "   Telegram structure not supported. " + errors)
         break;
 
         ############ Vypiseme na screen ##############################################################################

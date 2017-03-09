@@ -55,7 +55,10 @@ def get_demo_telegrams():
     # KAMSTUP AES
     # words.append("00005E442D2C9643636013047AD21050052F2F0422BA11000004140F000000043B0000000002FD1700100259A50A026CB316426CBF1544140F000000040F02000000025DAF0A04FF070600000004FF0802000000440F020000002F2F2F2F2F2F2F1234")  # AH
     # ZPA
-    # words.append("00002A44016A4493671201027244936712016A01020000002086108300762385010000862083009731920000001234")  # KZ
+    words.append("00002A44016A4493671201027244936712016A01020000002086108300762385010000862083009731920000001234")  # KZ
+    words.append("2e002a44016a4742750101027247427501016a01021b00002086108300b80b0000000086208300f82a000000008cd4")  # JA
+    words.append("2e002a44016a4742750101027247427501016a01021c00002086108300b80b0000000086208300f82a000000008cd3")  # JA
+    words.append("2e002a44016a4742750101027247427501016a01021d00002086108300b80b0000000086208300f82a000000008cd2")  # JA
     # PIKKERTON
     # words.append("000028442B414452127002027A3500000004FB2CCDC3000001FD49E002FD591A01022B200004035C0000001234")  # KZ
     # TECHEM
@@ -222,9 +225,11 @@ for i in range(0, wordLed):
     elif (sensor_manu == "KAM"):
         temperature = humidity = "22.2"
     elif (sensor_manu == "ZPA"):
-        temperature = humidity = "33.3"
-    elif (sensor_manu == "PIK"):
-        temperature = humidity = "44.4"
+        value1 = parsedstring[48:66]
+        value2 = parsedstring[70:88]
+        print(time.strftime(
+            "%H:%M:%S %d/%m/%Y") + "    Mereni: " + increment + "  Senzor: " + sensor_manu + "." + sensor_type + "." + sensor_sn + "." + sensor_ver + "    RSSI: " + rssi + "dB     AES: " + str(
+            aes).ljust(5, ' ') + "   Hodnota1: " + value1 + "   Hodnota2: " + value2 + errors)
     else:
         break;
 

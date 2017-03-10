@@ -8,10 +8,7 @@ import sqlite3
 # import os
 import sys, getopt
 import struct
-
-
 ############### Vypocitani VendorID z M-Pole ###########################################################################
-
 def get_vendor_name(vendor_input):
     vendor_hex1 = vendor_input[2:4]
     vendor_hex2 = vendor_input[0:2]
@@ -31,42 +28,43 @@ def get_vendor_name(vendor_input):
     znak3 = chr(vendor_char3)
     return znak1 + znak2 + znak3
 
-
 ############### Demonstracni hodnoty telegramu pro offline ukazku ci testy #############################################
-
-def get_demo_telegrams():
+def get_demo_telegrams(demo_type):
     words = []
-    # WEPTECH AES
-    # words.append("32002E44B05C10000000021B7A2B082005AC68E7F50EE6507BBE2D9F219C4F628B5899B9CD54239872373114E372C59E817DCF")  # ME
-    # words.append("32002E44B05C10000000021B7A2C0820051D2B70A744ACD71B237CF8F6C54C1A7A2E0DE2F24C9225E4BB0FB278C8A68CF77985")  # ME
-    # words.append("32002E44B05C10000000021B7A2D0820058FBFB2CE35F67F9F66E00E751BBBF5271E07F63C09BBAA77CDA574D6A0D672477C6E")  # ME
-    # WEPTECH CLEAN
-    words.append("32002E44B05C11000000021B7A920800002F2F0A6667020AFB1A560402FD971D01002F2F2F2F2F2F2F2F2F2F2F2F2F2F2F1234")  # KZ
-    words.append("32002e44b05c10000000021b7a660800002f2f0a6690010afb1a090302fd971d01002f2f2f2f2f2f2f2f2f2f2f2f2f2f2f8769")  # ME
-    # BONEGA AES
-    words.append("22001E44EE092101000001067A4F0010051AB94C4FDA694309E347E86FA437790C6ED5")  # KZ
-    # words.append("22001E44EE092101000001077A43001005C8C16D2F1F1DBDD884515FC9E4905B357C9C")  # ME
-    # words.append("22001E44EE092101000001067A430010051DBBA0F32262EBC81D9AF8F70CB8FB7E6ED5")  # ME
-    # words.append("22001E44EE092101000001077A44001005D3CCF20F690F2A9F3E6C6DC5CC32429F760C")  # ME
-    # words.append("22001E44EE092101000001067A440010055A5E995023C09D3756726C09C57B5DE27621")  # ME
-    # words.append("22001E44EE092101000001077A4500100578261B54AC056DC59A34EFABB7680580794A")  # ME
-    # KAMSTUP AES
-    # words.append("00005E442D2C9643636013047AD21050052F2F0422BA11000004140F000000043B0000000002FD1700100259A50A026CB316426CBF1544140F000000040F02000000025DAF0A04FF070600000004FF0802000000440F020000002F2F2F2F2F2F2F1234")  # AH
-    # ZPA
-    words.append("00002A44016A4493671201027244936712016A01020000002086108300762385010000862083009731920000001234")  # KZ
-    words.append("2e002a44016a4742750101027247427501016a01021b00002086108300b80b0000000086208300f82a000000008cd4")  # JA
-    # TECHEM
-    words.append("000032446850633481346980A0919F1DF800D0282901600CAE0C152000343A392328060000000000000000000000000000000000001234")  # KZ
+
+    if (demo_type=="iqrf"):
+        # WEPTECH AES
+        # words.append("32002E44B05C10000000021B7A2B082005AC68E7F50EE6507BBE2D9F219C4F628B5899B9CD54239872373114E372C59E817DCF")  # ME
+        # words.append("32002E44B05C10000000021B7A2C0820051D2B70A744ACD71B237CF8F6C54C1A7A2E0DE2F24C9225E4BB0FB278C8A68CF77985")  # ME
+        # words.append("32002E44B05C10000000021B7A2D0820058FBFB2CE35F67F9F66E00E751BBBF5271E07F63C09BBAA77CDA574D6A0D672477C6E")  # ME
+        # BONEGA AES
+        # words.append("22001E44EE092101000001077A43001005C8C16D2F1F1DBDD884515FC9E4905B357C9C")  # ME
+        # words.append("22001E44EE092101000001067A430010051DBBA0F32262EBC81D9AF8F70CB8FB7E6ED5")  # ME
+        # words.append("22001E44EE092101000001077A44001005D3CCF20F690F2A9F3E6C6DC5CC32429F760C")  # ME
+        # words.append("22001E44EE092101000001067A440010055A5E995023C09D3756726C09C57B5DE27621")  # ME
+        # words.append("22001E44EE092101000001077A4500100578261B54AC056DC59A34EFABB7680580794A")  # ME
+        # ZPA
+        words.append("00002A44016A4493671201027244936712016A01020000002086108300762385010000862083009731920000001234")  # KZ
+        words.append("2e002a44016a4742750101027247427501016a01021b00002086108300b80b0000000086208300f82a000000008cd4")  # JA
+        # TECHEM
+        words.append("000032446850633481346980A0919F1DF800D0282901600CAE0C152000343A392328060000000000000000000000000000000000001234")  # KZ
+    else:
+        # WEPTECH CLEAN
+        words.append("32002E44B05C11000000021B7A920800002F2F0A6667020AFB1A560402FD971D01002F2F2F2F2F2F2F2F2F2F2F2F2F2F2F1234")  # KZ
+        words.append("32002e44b05c10000000021b7a660800002f2f0a6690010afb1a090302fd971d01002f2f2f2f2f2f2f2f2f2f2f2f2f2f2f8769")  # ME
+        # BONEGA AES
+        #words.append("22001E44EE092101000001067A4F0010051AB94C4FDA694309E347E86FA437790C6ED5")  # KZ
+        # KAMSTRUP AES
+        words.append("00005E442D2C9643636013047AD210500584535BEF5623858243FF4961635B6D30017FE12743EEC8D5757B0A3EC5E0BB052ABDBF71A75179A1340D01389E144F861F56780A3F8E1543E2368676A7BDC26214D2330757F0684421A3D5B1E4C781B84231")  # AH
+        # KAMSTUP CLEAN
+        words.append("00005E442D2C9643636013047AD21000002F2F0422BA11000004140F000000043B0000000002FD1700100259A50A026CB316426CBF1544140F000000040F02000000025DAF0A04FF070600000004FF0802000000440F020000002F2F2F2F2F2F2F1234")  # AH
     return words
 
-
 ############### Vypocitani RSSI v dBm z (-3,-4) ########################################################################
-
 def get_signal_value(sensor_rssi):
     sensor_rssi = int(sensor_rssi, 16)
     sensor_rssi = (sensor_rssi / 2) - 130
     return str(sensor_rssi).rjust(6, ' ')
-
 
 ########################################################################################################################
 ########################################################################################################################
@@ -94,9 +92,13 @@ for o, a in myopts:
         print(
             '=      MainApplication.py -p <serial_port> -r <WmBus_mode>  -a <aes_key>                                    =')
         print(
-            '= Demo or testing purposes:                                                                                 =')
+            '= Demo mode with packets captured with IQRF with predefined AES key:                                        =')
         print(
-            '=      MainApplication.py -d                                                                                =')
+            '=      MainApplication.py -d iqrf                                                                           =')
+        print(
+            '= Demo mode with packets captured normally:                                                                 =')
+        print(
+            '=      MainApplication.py -d clean                                                                          =')
         print(
             '= Display this help                                                                                         =')
         print(
@@ -106,6 +108,7 @@ for o, a in myopts:
         sys.exit()
     if o == '-d':
         demo_run = True
+        demo_type = a
         break
     elif o == '-p':
         used_port = a
@@ -116,11 +119,12 @@ for o, a in myopts:
 
 ############### Stanoveni jestli jsem v demo rezimu nebo parsuji prichozi telegramy ####################################
 if (demo_run == True):
-    words = get_demo_telegrams()
+    words = get_demo_telegrams(demo_type)
     aes_iqrf = "000102030405060708090A0B0C0D0E0F"
 else:
-    words = get_demo_telegrams()
-    aes_iqrf = ""
+    words = get_demo_telegrams("clean")
+    aes_kamstup = "D8F378729241F6883DA548881A5524F6"
+    aes_iqrf = "000102030405060708090A0B0C0D0E0F"
 
 ############### Zacneme prochazet co mame k dispozici ##################################################################
 wordLed = len(words)
@@ -147,9 +151,11 @@ for i in range(0, wordLed):
 
         # Nacti co je potreba
         TELEGRAM_DECRYPTED = binascii.unhexlify(parsedstring[34:-4])
+        print(binascii.hexlify(TELEGRAM_DECRYPTED).upper())
         # AES_KEY_IQRF = binascii.unhexlify('2B7E151628AED2A6ABF7158809CF4F3C')
-        AES_KEY_DEVICE = binascii.unhexlify('2B7E151628AED2A6ABF7158809CF4F3C')
-        AES_IV = binascii.unhexlify('EE092101000001064F4F4F4F4F4F4F4F')
+        #AES_KEY_DEVICE = binascii.unhexlify('2B7E151628AED2A6ABF7158809CF4F3C') #BONEGA
+        AES_KEY_DEVICE = binascii.unhexlify('D8F378729241F6883DA548881A5524F6') #KAMSTRUP
+        AES_IV = binascii.unhexlify('2D2C964363601304D2D2D2D2D2D2D2D2')
 
         # Vsechno nad velkymi pismeny
         binascii.hexlify(AES_IV).upper()
@@ -170,6 +176,8 @@ for i in range(0, wordLed):
         # print(binascii.hexlify(TELEGRAM_DECRYPTED).upper())
         # print(binascii.hexlify(TELEGRAM_CRYPTED).upper())
         # print(binascii.hexlify(TELEGRAM_ORIGINAL).upper())
+
+        print(binascii.hexlify(TELEGRAM_ORIGINAL).upper())
 
         aes_control = binascii.hexlify(TELEGRAM_ORIGINAL[0:2]).upper()
         if (aes_control != b'2F2F'):
@@ -213,6 +221,7 @@ for i in range(0, wordLed):
             aes).ljust(5, ' ') + "   Průtok: " + counter.rjust(7, ' ') + "l    Cas: " + cascteni + errors)
     elif (sensor_manu == "KAM"):
         temperature = humidity = "22.2"
+        #tady pokracujeme.....
     elif (sensor_manu == "ZPA"):
         value1 = parsedstring[48:66]
         value2 = parsedstring[70:88]

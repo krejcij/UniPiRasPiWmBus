@@ -4,10 +4,113 @@ from Crypto.Cipher import AES
 import binascii
 import time
 import sqlite3
-# import serial
-# import os
+import serial
+import os
 import sys, getopt
 import struct
+
+############ Parsovani jednotliveho telegramu ##########################################################################
+def parse_telegram(parsedstring):
+    errors = ''
+    sensor_sn = parsedstring[18:20] + parsedstring[16:18] + parsedstring[14:16] + parsedstring[12:14]
+    sensor_ver = parsedstring[20:22]
+    sensor_type = parsedstring[22:24]
+    sensor_manu = get_vendor_name(parsedstring[8:12])
+
+    increment = str(int(parsedstring[26:28], 16)).rjust(3, ' ')
+
+    rssi = get_signal_value(parsedstring[-4:-2])
+
+    ############ Rozsifrujeme zasifrovany telegram #####################################################################
+    configuration_field = parsedstring[33:34]
+    if (configuration_field == '5'):
+        aes = True
+
+        # Nacti co je potreba
+        TELEGRAM_DECRYPTED = binascii.unhexlify(parsedstring[34:-4])
+        print(binascii.hexlify(TELEGRAM_DECRYPTED).upper())
+        # AES_KEY_IQRF = binascii.unhexlify('2B7E151628AED2A6ABF7158809CF4F3C')
+        #AES_KEY_DEVICE = binascii.unhexlify('2B7E151628AED2A6ABF7158809CF4F3C') #BONEGA
+        AES_KEY_DEVICE = binascii.unhexlify('D8F378729241F6883DA548881A5524F6') #KAMSTRUP
+        AES_IV = binascii.unhexlify('2D2C964363601304D2D2D2D2D2D2D2D2')
+
+        # Vsechno nad velkymi pismeny
+        binascii.hexlify(AES_IV).upper()
+        # binascii.hexlify(AES_KEY_IQRF).upper()
+        binascii.hexlify(AES_KEY_DEVICE).upper()
+        binascii.hexlify(TELEGRAM_DECRYPTED).upper()
+
+        # Vem telegram rozsifrovany univerzalnim klicem (AES klic zadany v IQRF) a zpet ho s nim zasifruj. Dostaneme sprave prenaseny telegram.
+        # encryptor_back = AES.new(AES_KEY_IQRF, AES.MODE_CBC, IV=AES_IV)
+        # TELEGRAM_CRYPTED = encryptor_back.encrypt(TELEGRAM_DECRYPTED)
+        TELEGRAM_CRYPTED = TELEGRAM_DECRYPTED
+
+        # Ten ted rozsifrujeme spravnym klicem (AES klic daneho zarizeni), dostaneme nesifrovana data.
+        encryptor_new = AES.new(AES_KEY_DEVICE, AES.MODE_CBC, IV=AES_IV)
+        TELEGRAM_ORIGINAL = encryptor_new.decrypt(TELEGRAM_CRYPTED)
+
+        # Pro kontrolu to vypiseme
+        # print(binascii.hexlify(TELEGRAM_DECRYPTED).upper())
+        # print(binascii.hexlify(TELEGRAM_CRYPTED).upper())
+        # print(binascii.hexlify(TELEGRAM_ORIGINAL).upper())
+
+        print(binascii.hexlify(TELEGRAM_ORIGINAL).upper())
+
+        aes_control = binascii.hexlify(TELEGRAM_ORIGINAL[0:2]).upper()
+        if (aes_control != b'2F2F'):
+            print("Chyba desifrovani paketu " + str(binascii.hexlify(TELEGRAM_DECRYPTED).upper()) + "!")
+            return
+        else:
+            parsedstring = parsedstring[0:34] + str(
+                binascii.hexlify(TELEGRAM_ORIGINAL).upper().decode('ascii')) + parsedstring[-4:]
+            # print(parsedstring)
+
+    else:
+        aes = False
+
+    ############ Vyparsujeme potrebne informace ########################################################################
+    if (sensor_manu == "WEP"):
+        if parsedstring[66:68] == "01": errors = "Vybita baterie"
+        temperature = parsedstring[44:45].replace("0", "") + parsedstring[45:46].replace("0", "") + parsedstring[
+                                                                                                    42:43] + "." + parsedstring[
+                                                                                                                   43:44]
+        humidity = parsedstring[54:55].replace("0", "") + parsedstring[55:56].replace("0", "") + parsedstring[
+                                                                                                 52:53] + "." + parsedstring[
+                                                                                                                53:54]
+        print(time.strftime(
+            "%H:%M:%S %d/%m/%Y") + "    Mereni: " + increment + "  Senzor: " + sensor_manu + "." + sensor_type + "." + sensor_sn + "." + sensor_ver + "    RSSI: " + rssi + "dB     AES: " + str(
+            aes).ljust(5, ' ') + "   Teplota: " + temperature.rjust(5, ' ') + "°C    Vlhkost: " + humidity.rjust(5,
+                                                                                                                 ' ') + "%     " + errors)
+    elif (sensor_manu == "BON"):
+        counter = parsedstring[48:50] + parsedstring[46:48] + parsedstring[44:46] + parsedstring[42:44]
+        counter = str(int(counter, 16))
+        bontime = str(bin(int(parsedstring[54:56], 16))[2:]).zfill(8)+str(bin(int(parsedstring[56:58], 16))[2:]).zfill(8)
+        bondate = str(bin(int(parsedstring[58:60], 16))[2:]).zfill(8)+str(bin(int(parsedstring[60:62], 16))[2:]).zfill(8)
+        minutes = str(int(bontime[2:8],2))
+        hours = str(int(bontime[11:16],2))
+        year1 = str(int(bondate[0:3],2))
+        year2 = str(int(bondate[8:12],2))
+        day = str(int(bondate[3:8],2))
+        month = str(int(bondate[12:16],2))
+        cascteni = hours + ":"+ minutes.zfill(2) + " " + day + "." + month + ".20" + year2 + year1
+        print(time.strftime(
+            "%H:%M:%S %d/%m/%Y") + "    Mereni: " + increment + "  Senzor: " + sensor_manu + "." + sensor_type + "." + sensor_sn + "." + sensor_ver + "    RSSI: " + rssi + "dB     AES: " + str(
+            aes).ljust(5, ' ') + "   Průtok: " + counter.rjust(7, ' ') + "l    Cas: " + cascteni + errors)
+    elif (sensor_manu == "KAM"):
+        temperature = humidity = "22.2"
+        #tady pokracujeme.....
+    elif (sensor_manu == "ZPA"):
+        value1 = parsedstring[58:70]
+        value2 = parsedstring[78:88]
+        #!!!prevratit a rozhexovat hodnoty (asi) a doplnit vytup dle DIF a VIF
+        print(time.strftime(
+            "%H:%M:%S %d/%m/%Y") + "    Mereni: " + increment + "  Senzor: " + sensor_manu + "." + sensor_type + "." + sensor_sn + "." + sensor_ver + "    RSSI: " + rssi + "dB     AES: " + str(
+            aes).ljust(5, ' ') + "   Hodnota1: " + value1 + "   Hodnota2: " + value2 + errors)
+    else:
+        print(time.strftime("%H:%M:%S %d/%m/%Y") + "    Mereni: " + increment + "  Senzor: " + sensor_manu + "." + sensor_type + "." + sensor_sn + "." + sensor_ver + "    RSSI: " + rssi + "dB     AES: " + str(
+            aes).ljust(5, ' ') + "   Telegram structure not supported. " + errors)
+    return
+
 ############### Vypocitani VendorID z M-Pole ###########################################################################
 def get_vendor_name(vendor_input):
     vendor_hex1 = vendor_input[2:4]
@@ -122,121 +225,48 @@ for o, a in myopts:
     elif o == '-r':
         used_aes = a
 
-############### Stanoveni jestli jsem v demo rezimu nebo parsuji prichozi telegramy ####################################
+############ Stanoveni jestli jsem v demo rezimu nebo parsuji prichozi telegramy a pak ty telegramy parsuj #############
 if (demo_run == True):
     words = get_demo_telegrams(demo_type)
     aes_iqrf = "000102030405060708090A0B0C0D0E0F"
-else:
-    words = get_demo_telegrams("clean")
-    aes_kamstup = "D8F378729241F6883DA548881A5524F6"
-    aes_iqrf = "000102030405060708090A0B0C0D0E0F"
-
-############### Zacneme prochazet co mame k dispozici ##################################################################
-wordLed = len(words)
-errors = ''
-for i in range(0, wordLed):
-
-    ############ Vysekame zaklady polozky ##############################################################################
+    wordLed = len(words)
     errors = ''
-    parsedstring = str(words[i])
+    for i in range(0, wordLed):
+        parse_telegram(str(words[i]))
+else:
+    # Setup a serial port
+    ser = serial.Serial(
+        port='/dev/ttyAMA0',
+        baudrate = 19200,
+        parity=serial.PARITY_NONE,
+        stopbits=serial.STOPBITS_ONE,
+        bytesize=serial.EIGHTBITS,
+        timeout=1
+    )
+    print "Device is on AMA0: " + str(ser.isOpen())
+    
+    # Wake up device
+    ser.write("\x00\x00")
+    print "Device is waked up: True"
+    
+    # Set as a sniffer
+    ser.write("\x00\x00>0a:01\x0D")
+    z = ser.readline()
+    print "Device is set as Sniffer T: " + z
+    
+    # Sniff all packets
+    print "Sniffing now:"
+    print ""
+    
+    while True:
+        readedstring = ''
+        readedstring = ser.read(200)
+        readedstring = binascii.hexlify(readedstring)
+        readedstring = str(readedstring)
 
-    sensor_sn = parsedstring[18:20] + parsedstring[16:18] + parsedstring[14:16] + parsedstring[12:14]
-    sensor_ver = parsedstring[20:22]
-    sensor_type = parsedstring[22:24]
-    sensor_manu = get_vendor_name(parsedstring[8:12])
+        if readedstring:
+            parse_telegram(readedstring)
 
-    increment = str(int(parsedstring[26:28], 16)).rjust(3, ' ')
+############ Ukoncime hrani ############################################################################################
+ser.close()
 
-    rssi = get_signal_value(parsedstring[-4:-2])
-
-    ############ Rozsifrujeme zasifrovany telegram #####################################################################
-    configuration_field = parsedstring[33:34]
-    if (configuration_field == '5'):
-        aes = True
-
-        # Nacti co je potreba
-        TELEGRAM_DECRYPTED = binascii.unhexlify(parsedstring[34:-4])
-        print(binascii.hexlify(TELEGRAM_DECRYPTED).upper())
-        # AES_KEY_IQRF = binascii.unhexlify('2B7E151628AED2A6ABF7158809CF4F3C')
-        #AES_KEY_DEVICE = binascii.unhexlify('2B7E151628AED2A6ABF7158809CF4F3C') #BONEGA
-        AES_KEY_DEVICE = binascii.unhexlify('D8F378729241F6883DA548881A5524F6') #KAMSTRUP
-        AES_IV = binascii.unhexlify('2D2C964363601304D2D2D2D2D2D2D2D2')
-
-        # Vsechno nad velkymi pismeny
-        binascii.hexlify(AES_IV).upper()
-        # binascii.hexlify(AES_KEY_IQRF).upper()
-        binascii.hexlify(AES_KEY_DEVICE).upper()
-        binascii.hexlify(TELEGRAM_DECRYPTED).upper()
-
-        # Vem telegram rozsifrovany univerzalnim klicem (AES klic zadany v IQRF) a zpet ho s nim zasifruj. Dostaneme sprave prenaseny telegram.
-        # encryptor_back = AES.new(AES_KEY_IQRF, AES.MODE_CBC, IV=AES_IV)
-        # TELEGRAM_CRYPTED = encryptor_back.encrypt(TELEGRAM_DECRYPTED)
-        TELEGRAM_CRYPTED = TELEGRAM_DECRYPTED
-
-        # Ten ted rozsifrujeme spravnym klicem (AES klic daneho zarizeni), dostaneme nesifrovana data.
-        encryptor_new = AES.new(AES_KEY_DEVICE, AES.MODE_CBC, IV=AES_IV)
-        TELEGRAM_ORIGINAL = encryptor_new.decrypt(TELEGRAM_CRYPTED)
-
-        # Pro kontrolu to vypiseme
-        # print(binascii.hexlify(TELEGRAM_DECRYPTED).upper())
-        # print(binascii.hexlify(TELEGRAM_CRYPTED).upper())
-        # print(binascii.hexlify(TELEGRAM_ORIGINAL).upper())
-
-        print(binascii.hexlify(TELEGRAM_ORIGINAL).upper())
-
-        aes_control = binascii.hexlify(TELEGRAM_ORIGINAL[0:2]).upper()
-        if (aes_control != b'2F2F'):
-            print("Chyba desifrovani paketu " + str(binascii.hexlify(TELEGRAM_DECRYPTED).upper()) + "!")
-            continue
-        else:
-            parsedstring = parsedstring[0:34] + str(
-                binascii.hexlify(TELEGRAM_ORIGINAL).upper().decode('ascii')) + parsedstring[-4:]
-            # print(parsedstring)
-
-    else:
-        aes = False
-
-    ############ Vyparsujeme potrebne informace ########################################################################
-    if (sensor_manu == "WEP"):
-        if parsedstring[66:68] == "01": errors = "Vybita baterie"
-        temperature = parsedstring[44:45].replace("0", "") + parsedstring[45:46].replace("0", "") + parsedstring[
-                                                                                                    42:43] + "." + parsedstring[
-                                                                                                                   43:44]
-        humidity = parsedstring[54:55].replace("0", "") + parsedstring[55:56].replace("0", "") + parsedstring[
-                                                                                                 52:53] + "." + parsedstring[
-                                                                                                                53:54]
-        print(time.strftime(
-            "%H:%M:%S %d/%m/%Y") + "    Mereni: " + increment + "  Senzor: " + sensor_manu + "." + sensor_type + "." + sensor_sn + "." + sensor_ver + "    RSSI: " + rssi + "dB     AES: " + str(
-            aes).ljust(5, ' ') + "   Teplota: " + temperature.rjust(5, ' ') + "°C    Vlhkost: " + humidity.rjust(5,
-                                                                                                                 ' ') + "%     " + errors)
-    elif (sensor_manu == "BON"):
-        counter = parsedstring[48:50] + parsedstring[46:48] + parsedstring[44:46] + parsedstring[42:44]
-        counter = str(int(counter, 16))
-        bontime = str(bin(int(parsedstring[54:56], 16))[2:]).zfill(8)+str(bin(int(parsedstring[56:58], 16))[2:]).zfill(8)
-        bondate = str(bin(int(parsedstring[58:60], 16))[2:]).zfill(8)+str(bin(int(parsedstring[60:62], 16))[2:]).zfill(8)
-        minutes = str(int(bontime[2:8],2))
-        hours = str(int(bontime[11:16],2))
-        year1 = str(int(bondate[0:3],2))
-        year2 = str(int(bondate[8:12],2))
-        day = str(int(bondate[3:8],2))
-        month = str(int(bondate[12:16],2))
-        cascteni = hours + ":"+ minutes.zfill(2) + " " + day + "." + month + ".20" + year2 + year1
-        print(time.strftime(
-            "%H:%M:%S %d/%m/%Y") + "    Mereni: " + increment + "  Senzor: " + sensor_manu + "." + sensor_type + "." + sensor_sn + "." + sensor_ver + "    RSSI: " + rssi + "dB     AES: " + str(
-            aes).ljust(5, ' ') + "   Průtok: " + counter.rjust(7, ' ') + "l    Cas: " + cascteni + errors)
-    elif (sensor_manu == "KAM"):
-        temperature = humidity = "22.2"
-        #tady pokracujeme.....
-    elif (sensor_manu == "ZPA"):
-        value1 = parsedstring[58:70]
-        value2 = parsedstring[78:88]
-        #!!!prevratit a rozhexovat hodnoty (asi) a doplnit vytup dle DIF a VIF
-        print(time.strftime(
-            "%H:%M:%S %d/%m/%Y") + "    Mereni: " + increment + "  Senzor: " + sensor_manu + "." + sensor_type + "." + sensor_sn + "." + sensor_ver + "    RSSI: " + rssi + "dB     AES: " + str(
-            aes).ljust(5, ' ') + "   Hodnota1: " + value1 + "   Hodnota2: " + value2 + errors)
-    else:
-        print(time.strftime("%H:%M:%S %d/%m/%Y") + "    Mereni: " + increment + "  Senzor: " + sensor_manu + "." + sensor_type + "." + sensor_sn + "." + sensor_ver + "    RSSI: " + rssi + "dB     AES: " + str(
-            aes).ljust(5, ' ') + "   Telegram structure not supported. " + errors)
-        break;
-
-        ############ Vypiseme na screen ##############################################################################

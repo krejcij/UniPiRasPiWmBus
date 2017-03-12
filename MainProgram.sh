@@ -4,6 +4,6 @@ clear
 
 echo Starting ...
 
-screen python3 MainApplication.py
+screen python MainApplication.py
 
 echo Done ...

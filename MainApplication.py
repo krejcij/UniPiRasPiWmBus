@@ -180,54 +180,16 @@ def get_signal_value(sensor_rssi):
 ########################################################################################################################
 ########################################################################################################################
 
-############### Nastavime parametry pomoci argumentu prikazoveho radku #################################################
+############### Overime jestli neficime v demo modu ####################################################################
 used_port = used_mode = demo_run = ""
 myopts, args = getopt.getopt(sys.argv[1:], "o:a:")
-for o, a in myopts:
-    if o == '-h' or o == '-help':
-        print(
-            '=============================================================================================================')
-        print(
-            '= Python script used for reading WmBUS telegrams with IQRF module implanted on UniPi module for RaspberryPi =')
-        print(
-            '=============================================================================================================')
-        print(
-            '= General usage of the script:                                                                              =')
-        print(
-            '=      MainApplication.py                                                                                   =')
-        print(
-            '= Modified run of the script:                                                                               =')
-        print(
-            '=      MainApplication.py -p <serial_port> -r <WmBus_mode>  -a <aes_key>                                    =')
-        print(
-            '= Demo mode with packets captured with IQRF with predefined AES key:                                        =')
-        print(
-            '=      MainApplication.py -d iqrf                                                                           =')
-        print(
-            '= Demo mode with packets captured normally:                                                                 =')
-        print(
-            '=      MainApplication.py -d clean                                                                          =')
-        print(
-            '= Display this help                                                                                         =')
-        print(
-            '=      MainApplication.py -h                                                                                =')
-        print(
-            '=============================================================================================================')
-        sys.exit()
-    if o == '-d':
-        demo_run = True
-        demo_type = a
-        break
-    elif o == '-p':
-        used_port = a
-    elif o == '-r':
-        used_mode = a
-    elif o == '-r':
-        used_aes = a
+if (len(args)>0):
+    demo_run = True
 
 ############ Stanoveni jestli jsem v demo rezimu nebo parsuji prichozi telegramy a pak ty telegramy parsuj #############
 if (demo_run == True):
-    words = get_demo_telegrams(demo_type)
+    print("Running in demonstration (" + args[0] + ") mode.")
+    words = get_demo_telegrams(args[0])
     aes_iqrf = "000102030405060708090A0B0C0D0E0F"
     wordLed = len(words)
     errors = ''
@@ -243,20 +205,20 @@ else:
         bytesize=serial.EIGHTBITS,
         timeout=1
     )
-    print "Device is on AMA0: " + str(ser.isOpen())
-    
+    print ("Device is on AMA0: " + str(ser.isOpen()))
+
     # Wake up device
     ser.write("\x00\x00")
-    print "Device is waked up: True"
-    
+    print ("Device is waked up: True")
+
     # Set as a sniffer
     ser.write("\x00\x00>0a:01\x0D")
     z = ser.readline()
-    print "Device is set as Sniffer T: " + z
-    
+    print ("Device is set as Sniffer T: " + z)
+
     # Sniff all packets
-    print "Sniffing now:"
-    print ""
+    print ("Sniffing now:")
+    print ("")
     
     while True:
         readedstring = ''
@@ -268,5 +230,8 @@ else:
             parse_telegram(readedstring)
 
 ############ Ukoncime hrani ############################################################################################
-ser.close()
+try:
+    ser.close()
+except NameError:
+    print ("WARNING: Serial port not closed correctly.")
 

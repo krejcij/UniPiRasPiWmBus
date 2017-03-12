@@ -1,13 +1,23 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-from Crypto.Cipher import AES
 import binascii
 import time
-import sqlite3
-import serial
-import os
 import sys, getopt
-import struct
+try:
+    from Crypto.Cipher import AES
+except ImportError:
+    print("FATAL ERROR: PyCrypto module not found !")
+    exit(1)
+try:
+    import sqlite3
+except ImportError:
+    print("FATAL ERROR: SQite3 module not found !")
+    exit(1)
+try:
+    import serial
+except ImportError:
+    print("FATAL ERROR: Serial module not found !")
+    demo_run = True
 
 ############ Parsovani jednotliveho telegramu ##########################################################################
 def parse_telegram(parsedstring):

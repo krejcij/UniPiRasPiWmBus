@@ -4,6 +4,10 @@ import binascii
 import time
 import sys, getopt
 
+global db
+global file
+global demo_run
+
 try:
     from Crypto.Cipher import AES
 except ImportError:
@@ -19,8 +23,6 @@ try:
 except ImportError:
     print("FATAL ERROR: Serial module not found !")
     demo_run = True
-
-
 ############ Vypis hodnoty dle LSB #####################################################################################
 def LSB(bytes):
     new = ""
@@ -30,14 +32,19 @@ def LSB(bytes):
         size = size - 2
     return new
 
-
 ############ Logovani do souboru #######################################################################################
 def log(log):
     file.write(bytes(time.strftime("%d/%m/%Y  %H:%M:%S  ") + log + "\n", 'UTF-8'))
     return
 
+############ Databazovy zapis ##########################################################################################
+def sql(query):
+    db.execute(query)
+    db.commit()
+    output(query)
+    return
 
-############ Obecny vystup #######################################################################################
+############ Obecny vystup #############################################################################################
 def output(output):
     log(output)
     print(time.strftime("%d/%m/%Y  %H:%M:%S  ") + output)
@@ -48,14 +55,26 @@ def output(output):
 def parse_telegram(parsedstring):
     output("Received telegram: " + parsedstring)
     errors = ''
-    sensor_sn = parsedstring[18:20] + parsedstring[16:18] + parsedstring[14:16] + parsedstring[12:14]
+    sensor_sn = LSB(parsedstring[12:20])
+    print(sensor_sn)
     sensor_ver = parsedstring[20:22]
     sensor_type = parsedstring[22:24]
     sensor_manu = get_vendor_name(parsedstring[8:12])
+    device = parsedstring[8:24].upper()
 
     increment = str(int(parsedstring[26:28], 16)).rjust(3, ' ')
 
     rssi = get_signal_value(parsedstring[-4:-2])
+
+    if(demo_run != True):
+        # Get actual IQRF key
+        ser.write("\x00\x00>03?\x0D")
+        iqrf_key = ser.readline()
+        output("Actual AES key is: " + iqrf_key[1:])
+    else:
+        iqrf_key = "-"
+
+    sql("INSERT INTO TELEGRAMS (DATETIME,PRE,HEADER,DATA,POST,AESKEY) VALUES ('"+time.strftime("%Y-%m-%d %H:%M")+"', '"+parsedstring[0:4]+"', '"+parsedstring[4:34]+"', '"+parsedstring[34:-4]+"', '"+parsedstring[-4:]+"','"+iqrf_key+"')")
 
     ############ Rozsifrujeme zasifrovany telegram #####################################################################
     configuration_field = parsedstring[33:34]
@@ -111,6 +130,8 @@ def parse_telegram(parsedstring):
         humidity = parsedstring[54:55].replace("0", "") + parsedstring[55:56].replace("0", "") + parsedstring[
                                                                                                  52:53] + "." + parsedstring[
                                                                                                                 53:54]
+        sql("INSERT INTO MEASURES (DATETIME,DEVICE,RSSI,TYPE1,VALUE1,TYPE2,VALUE2) VALUES ('" + time.strftime(
+            "%Y-%m-%d %H:%M") + "', '" + device + "', '" + rssi + "', '°C', '" + temperature + "','%','"+humidity+"')")
         output(
             "Mereni: " + increment + "  Senzor: " + sensor_manu + "." + sensor_type + "." + sensor_sn + "." + sensor_ver + "    RSSI: " + rssi + "dB     AES: " + str(
                 aes).ljust(5, ' ') + "   Teplota: " + temperature.rjust(5, ' ') + "°C    Vlhkost: " + humidity.rjust(5,
@@ -129,6 +150,8 @@ def parse_telegram(parsedstring):
         day = str(int(bondate[3:8], 2))
         month = str(int(bondate[12:16], 2))
         cascteni = hours + ":" + minutes.zfill(2) + " " + day + "." + month + ".20" + year2 + year1
+        sql("INSERT INTO MEASURES (DATETIME,DEVICE,RSSI,TYPE1,VALUE1,TYPE2,VALUE2) VALUES ('" + time.strftime(
+            "%Y-%m-%d %H:%M") + "', '" + device + "', '" + rssi + "', 'l', '" + counter + "','Odecet','"+cascteni+"')")
         output(
             "Mereni: " + increment + "  Senzor: " + sensor_manu + "." + sensor_type + "." + sensor_sn + "." + sensor_ver + "    RSSI: " + rssi + "dB     AES: " + str(
                 aes).ljust(5, ' ') + "   Průtok: " + counter.rjust(7, ' ') + "l    Cas: " + cascteni + errors)
@@ -139,6 +162,8 @@ def parse_telegram(parsedstring):
         value1 = parsedstring[58:70]
         value2 = parsedstring[78:88]
         # !!!rozhexovat hodnoty (asi) a doplnit vytup dle DIF a VIF
+        sql("INSERT INTO MEASURES (DATETIME,DEVICE,RSSI,TYPE1,VALUE1,TYPE2,VALUE2) VALUES ('" + time.strftime(
+            "%Y-%m-%d %H:%M") + "', '" + device + "', '" + rssi + "', 'Wh', '" + value1 + "','Wh','"+value2+"')")
         output(
             "Mereni: " + increment + "  Senzor: " + sensor_manu + "." + sensor_type + "." + sensor_sn + "." + sensor_ver + "    RSSI: " + rssi + "dB     AES: " + str(
                 aes).ljust(5, ' ') + "   Tarif 1: " + LSB(value1) + "Wh   Tarif 2: " + LSB(value2) + "Wh" + errors)
@@ -233,6 +258,7 @@ try:
 except NameError:
     output("ERROR: Database cannot be estabilished.")
 try:
+    global file
     file = open("MainLog.txt", "ab")
     file.write(
         bytes("########################   " + time.strftime("%d/%m/%Y  %H:%M:%S") + "   ########################\n",
@@ -241,7 +267,7 @@ except NameError:
     print("ERROR: Database cannot be estabilished.")
 
 ############### Overime jestli neficime v demo modu ####################################################################
-used_port = used_mode = demo_run = ""
+demo_run=""
 myopts, args = getopt.getopt(sys.argv[1:], "o:a:")
 if (len(args) > 0):
     demo_run = True

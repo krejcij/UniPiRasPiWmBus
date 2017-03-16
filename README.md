@@ -11,3 +11,15 @@ Skript can be run in Python interpreter:
 ### Example
 
 ![Screen](./MainExample.png)
+
+### Wishlist
++ Add Kamstrup parsing structure
++ Add Pikkerton parsing structure
++ Add encrypt/decrypt function
++ Finalize parsing Bonega values and time
++ Repair daily log dividing
++ Create export application
++ Create data visualisation
++ Create rapsi apache website
++ Run this app as a service
++ Create instalation script

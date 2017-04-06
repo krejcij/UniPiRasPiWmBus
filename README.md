@@ -13,9 +13,6 @@ Skript can be run in Python interpreter:
 ![Screen](./MainExample.png)
 
 ### Wishlist
-+ Add encrypt/decrypt function
-+ Repair daily log dividing
 + Create data visualisation
 + Create rapsi apache website
 + Run this app as a service
-+ Create instalation script

@@ -4,9 +4,8 @@ import binascii
 import time
 import sys, getopt
 
-global db
-global file
-global demo_run
+global db, demo_run
+global file, fsrc, ferr, fsql, fpar, fcap, fscr
 global AES_IQRF_KLIC_DEMO_TELEGRAMU
 AES_IQRF_KLIC_DEMO_TELEGRAMU = 'FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF'
 
@@ -34,27 +33,36 @@ def LSB(bytes):
         size = size - 2
     return new
 
-############ Logovani do souboru #######################################################################################
-def log(log):
-    file.write(bytes(time.strftime("%d/%m/%Y  %H:%M:%S  ") + log + "\n", 'UTF-8'))
-    return
-
 ############ Databazovy zapis ##########################################################################################
 def sql(query):
     db.execute(query)
     db.commit()
-    output(query)
+    output('SQL',query)
     return
 
 ############ Obecny vystup #############################################################################################
-def output(output):
-    log(output)
-    print(time.strftime("%d/%m/%Y  %H:%M:%S  ") + output)
+def output(dest,output):
+    file.write(bytes(time.strftime("%d/%m/%Y  %H:%M:%S  ") + dest + "  " + output + "\n", 'UTF-8'))
+    if (dest=='SCR'):
+        fscr.write(bytes(time.strftime("%d/%m/%Y  %H:%M:%S  ") + output + "\n", 'UTF-8'))
+        print(time.strftime("%d/%m/%Y  %H:%M:%S  ") + output)
+    elif (dest=='ERR'):
+        ferr.write(bytes(time.strftime("%d/%m/%Y  %H:%M:%S  ") + output + "\n", 'UTF-8'))
+        print(time.strftime("%d/%m/%Y  %H:%M:%S  ") + "ERROR: "+ output)
+    elif (dest=='PAR'):
+        fpar.write(bytes(time.strftime("%d/%m/%Y  %H:%M:%S  ") + output + "\n", 'UTF-8'))
+        print(time.strftime("%d/%m/%Y  %H:%M:%S  ") + output)
+    elif (dest == 'SQL'):
+        fsql.write(bytes(time.strftime("%d/%m/%Y  %H:%M:%S  ") + output + "\n", 'UTF-8'))
+    elif (dest == 'CAP'):
+        fcap.write(bytes(time.strftime("%d/%m/%Y  %H:%M:%S  ") + output + "\n", 'UTF-8'))
+    else:
+        pass
     return
 
 ############ Parsovani jednotliveho telegramu ##########################################################################
 def parse_telegram(parsedstring,RunType):
-    output("Received telegram: " + parsedstring)
+    output('CAP',"Received telegram: " + parsedstring)
     errors = ''
     sensor_sn = LSB(parsedstring[12:20])
     sensor_ver = parsedstring[20:22]
@@ -70,7 +78,7 @@ def parse_telegram(parsedstring,RunType):
         # Get actual IQRF key
         ser.write("\x00\x00>03?\x0D")
         AES_KEY_IQRF = ser.readline()
-        output("Actual AES key is: " + AES_KEY_IQRF[1:].upper())
+        output('MAIN',"Actual AES key is: " + AES_KEY_IQRF[1:].upper())
     else:
         AES_KEY_IQRF = binascii.unhexlify(AES_IQRF_KLIC_DEMO_TELEGRAMU) #DEFAULT AES IQRF KEY
         sql("INSERT INTO TELEGRAMS (DATETIME,PRE,HEADER,DATA,POST,AESKEY) VALUES ('"+time.strftime("%Y-%m-%d %H:%M")+"', '"+parsedstring[0:4]+"', '"+parsedstring[4:34]+"', '"+parsedstring[34:-4]+"', '"+parsedstring[-4:]+"','"+AES_IQRF_KLIC_DEMO_TELEGRAMU+"')")
@@ -106,22 +114,19 @@ def parse_telegram(parsedstring,RunType):
         encryptor_new = AES.new(AES_KEY_DEVICE, AES.MODE_CBC, IV=AES_IV)
         TELEGRAM_ORIGINAL = encryptor_new.decrypt(TELEGRAM_CRYPTED)
 
-        # Pro kontrolu to vypiseme
-        print(bytes("AES_IV: ",'UTF-8')+binascii.hexlify(AES_IV))
-        print(bytes("AES_DEVICE: ",'UTF-8')+binascii.hexlify(AES_KEY_DEVICE))
-        print(bytes("AES_TEL_DECRYPTED: ",'UTF-8')+binascii.hexlify(TELEGRAM_DECRYPTED))
-        print(bytes("AES_TEL_CRYPTED: ",'UTF-8')+binascii.hexlify(TELEGRAM_CRYPTED))
-        print(bytes("AES_TEL_ORIGINAL: ",'UTF-8')+binascii.hexlify(TELEGRAM_ORIGINAL))
-
         aes_control = binascii.hexlify(TELEGRAM_ORIGINAL[0:2]).upper()
         if (aes_control != b'2F2F'):
-            output("ERROR: nelze desifrovat paket " + str(binascii.hexlify(TELEGRAM_DECRYPTED).upper()))
+            output('ERR',"ERROR: Nelze desifrovat paket " + str(binascii.hexlify(TELEGRAM_DECRYPTED).upper()))
+            # Pro kontrolu to vypiseme
+            output('ERR',bytes("AES_IV: ", 'UTF-8') + binascii.hexlify(AES_IV))
+            output('ERR',bytes("AES_DEVICE: ", 'UTF-8') + binascii.hexlify(AES_KEY_DEVICE))
+            output('ERR',bytes("AES_TEL_DECRYPTED: ", 'UTF-8') + binascii.hexlify(TELEGRAM_DECRYPTED))
+            output('ERR',bytes("AES_TEL_CRYPTED: ", 'UTF-8') + binascii.hexlify(TELEGRAM_CRYPTED))
+            output('ERR',bytes("AES_TEL_ORIGINAL: ", 'UTF-8') + binascii.hexlify(TELEGRAM_ORIGINAL))
             return
         else:
             parsedstring = parsedstring[0:34] + str(
                 binascii.hexlify(TELEGRAM_ORIGINAL).upper().decode('ascii')) + parsedstring[-4:]
-            # print(parsedstring)
-
     else:
         aes = False
 
@@ -134,7 +139,7 @@ def parse_telegram(parsedstring,RunType):
                                                                                                                 53:54]
         sql("INSERT INTO MEASURES (DATETIME,DEVICE,RSSI,TYPE1,VALUE1,TYPE2,VALUE2) VALUES ('" + time.strftime(
             "%Y-%m-%d %H:%M") + "', '" + device + "', '" + rssi + "', '°C', '" + temperature + "','%','"+humidity+"')")
-        output(
+        output('PAR',
             "Mereni: " + increment + "  Senzor: " + sensor_manu + "." + sensor_type + "." + sensor_sn + "." + sensor_ver + "    RSSI: " + rssi + "dB     AES: " + str(
                 aes).ljust(5, ' ') + "   Teplota: " + temperature.rjust(5, ' ') + "°C    Vlhkost: " + humidity.rjust(5,
                                                                                                                      ' ') + "%     " + errors)
@@ -144,26 +149,20 @@ def parse_telegram(parsedstring,RunType):
 
         sql("INSERT INTO MEASURES (DATETIME,DEVICE,RSSI,TYPE1,VALUE1,TYPE2,VALUE2) VALUES ('" + time.strftime(
             "%Y-%m-%d %H:%M") + "', '" + device + "', '" + rssi + "', 'l', '" + Spotreba + "','Odecet','"+Cascteni+"')")
-        output(
+        output('PAR',
             "Mereni: " + increment + "  Senzor: " + sensor_manu + "." + sensor_type + "." + sensor_sn + "." + sensor_ver + "    RSSI: " + rssi + "dB     AES: " + str(
-                aes).ljust(5, ' ') + "   Spotřeba: " + Spotreba.rjust(7, ' ') + "l    Cas: " + Cascteni + errors)
+                aes).ljust(5, ' ') + "   Spotreba: " + Spotreba.rjust(7, ' ') + "l    Cas: " + Cascteni + errors)
     elif (sensor_manu == "KAM"):
         #DobaBehu = int(LSB(parsedstring[42:50]),16)
         #Prurez1 = int(LSB(parsedstring[54:62]), 16)
         Prutok = str(int(LSB(parsedstring[66:74]), 16))
-        # RozsirujiciChyby print(parsedstring[80:84])
         Teplota1 = str(int(LSB(parsedstring[88:92]), 16)/100)
-        DatumCas1 = get_date(LSB(parsedstring[96:100]))
-        DatumCas2 = get_date(LSB(parsedstring[104:108]))
         #Prurez2 = int(LSB(parsedstring[112:120]), 16)
         Energie1 = str(int(LSB(parsedstring[124:132]), 16)*10)
         Teplota2 = str(int(LSB(parsedstring[136:140]), 16)/100)
-        #KamstupSpecific print(parsedstring[146:154])
-        #KamstrupSpecific print(parsedstring[158:166])
         Energie2 = str(int(LSB(parsedstring[172:180]), 16)*10)
-        # KAMSTRUP aktualne neukladame z duvodu dlouhodobeho rizeneho neotestovani
         # sql("INSERT INTO MEASURES (DATETIME,DEVICE,RSSI,TYPE1,VALUE1,TYPE2,VALUE2) VALUES ('" + time.strftime("%Y-%m-%d %H:%M") + "', '" + device + "', '" + rssi + "', 'Wh', '" + value1 + "','Wh','"+value2+"')")
-        output(
+        output('PAR',
             "Mereni: " + increment + "  Senzor: " + sensor_manu + "." + sensor_type + "." + sensor_sn + "." + sensor_ver + "    RSSI: " + rssi + "dB     AES: " + str(
                 aes).ljust(5, ' ') + "   Teplota: " + Teplota1 +"/"+ Teplota2 + "°C   Energie: " + Energie1 + "/" + Energie2 + "MJ  Prutok: " + Prutok +"m3/hod"  + errors)
 
@@ -172,13 +171,14 @@ def parse_telegram(parsedstring,RunType):
         Spotreba2 = str(int(LSB(parsedstring[78:88]), 16)/1000)
         sql("INSERT INTO MEASURES (DATETIME,DEVICE,RSSI,TYPE1,VALUE1,TYPE2,VALUE2) VALUES ('" + time.strftime(
             "%Y-%m-%d %H:%M") + "', '" + device + "', '" + rssi + "', 'kWh', '" + Spotreba1 + "','kWh','"+Spotreba2+"')")
-        output(
+        output('PAR',
             "Mereni: " + increment + "  Senzor: " + sensor_manu + "." + sensor_type + "." + sensor_sn + "." + sensor_ver + "    RSSI: " + rssi + "dB     AES: " + str(
                 aes).ljust(5, ' ') + "   Spotreba T1: " + Spotreba1 + "kWh   Spotreba T2: " + Spotreba2 + "kWh" + errors)
     else:
-        output(
+        output('PAR',
             "Mereni: " + increment + "  Senzor: " + sensor_manu + "." + sensor_type + "." + sensor_sn + "." + sensor_ver + "    RSSI: " + rssi + "dB     AES: " + str(
                 aes).ljust(5, ' ') + "   Telegram structure not supported. " + errors)
+        output('ERR',"Telegram structure not supported: " + str(parsedstring))
     return
 
 ############################ Vypocitani data ve formatu G ##############################################################
@@ -274,15 +274,23 @@ def get_signal_value(sensor_rssi):
 try:
     db = sqlite3.connect('MainDatabase.db')
 except NameError:
-    output("ERROR: Database cannot be estabilished.")
+    output('ERR',"Database cannot be estabilished.")
 try:
     global file
-    file = open("MainLog.txt", "ab")
-    file.write(
-        bytes("########################   " + time.strftime("%d/%m/%Y  %H:%M:%S") + "   ########################\n",
-              'UTF-8'))
+    file = open("logs/ALL.txt", "ab")
+    file.write(bytes("########################   " + time.strftime("%d/%m/%Y  %H:%M:%S") + "   ########################\n",'UTF-8'))
+    fsql = open("logs/SQL.txt", "ab")
+    fsql.write(bytes("########################   " + time.strftime("%d/%m/%Y  %H:%M:%S") + "   ########################\n",'UTF-8'))
+    ferr = open("logs/ERR.txt", "ab")
+    ferr.write(bytes("########################   " + time.strftime("%d/%m/%Y  %H:%M:%S") + "   ########################\n",'UTF-8'))
+    fcap = open("logs/CAP.txt", "ab")
+    fcap.write(bytes("########################   " + time.strftime("%d/%m/%Y  %H:%M:%S") + "   ########################\n",'UTF-8'))
+    fpar = open("logs/PAR.txt", "ab")
+    fpar.write(bytes("########################   " + time.strftime("%d/%m/%Y  %H:%M:%S") + "   ########################\n",'UTF-8'))
+    fscr = open("logs/SCR.txt", "ab")
+    fscr.write(bytes("########################   " + time.strftime("%d/%m/%Y  %H:%M:%S") + "   ########################\n",'UTF-8'))
 except NameError:
-    print("ERROR: Database cannot be estabilished.")
+    print("ERROR: Log files cannot be created.")
 
 ############### Overime jestli neficime v demo modu ####################################################################
 demo_run=""
@@ -292,7 +300,7 @@ if (len(args) > 0):
 
 ############ Stanoveni jestli jsem v demo rezimu nebo parsuji prichozi telegramy a pak ty telegramy parsuj #############
 if (demo_run == True):
-    output("Running in demonstration (" + args[0] + ") mode.")
+    output("SCR","Running in demonstration (" + args[0] + ") mode.")
     words = get_demo_telegrams(args[0])
     wordLed = len(words)
     errors = ''
@@ -308,19 +316,19 @@ else:
         bytesize=serial.EIGHTBITS,
         timeout=1
     )
-    output("Device is on AMA0: " + str(ser.isOpen()))
+    output("SCR","Device is on AMA0: " + str(ser.isOpen()))
 
     # Wake up device
     ser.write("\x00\x00")
-    output("Device is waked up: True")
+    output("SCR","Device is waked up: True")
 
     # Set as a sniffer
     ser.write("\x00\x00>0a:01\x0D")
     z = ser.readline()
-    output("Device is set as Sniffer T: " + z)
+    output("SCR","Device is set as Sniffer T: " + z)
 
     # Sniff all packets
-    output("Sniffing now:")
+    output("SCR","Sniffing now:")
 
     while True:
         readedstring = ''
@@ -335,12 +343,12 @@ else:
 try:
     ser.close()
 except NameError:
-    output("WARNING: Serial port not closed correctly.")
+    output('ERR',"Serial port not closed correctly.")
 try:
     db.close()
 except NameError:
-    output("WARNING: Database not closed correctly.")
+    output('ERR',"Database not closed correctly.")
 try:
     file.close()
 except NameError:
-    output("WARNING: File not closed correctly.")
+    output('ERR',"File not closed correctly.")

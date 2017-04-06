@@ -2,9 +2,11 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="c48d3ae6-f19b-4b05-9a0f-869383ac9eb4" name="Default" comment="">
+      <change type="DELETED" beforePath="$PROJECT_DIR$/MainDatabase.db.sql" afterPath="" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/MainDatabase.db" afterPath="$PROJECT_DIR$/MainDatabase.db" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/MainApplication.py" afterPath="$PROJECT_DIR$/MainApplication.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/README.md" afterPath="$PROJECT_DIR$/README.md" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -22,19 +24,29 @@
       <file leaf-file-name="MainApplication.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/MainApplication.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="204">
-              <caret line="227" column="8" lean-forward="false" selection-start-line="227" selection-start-column="8" selection-end-line="227" selection-end-column="8" />
+            <state relative-caret-position="410">
+              <caret line="46" column="12" lean-forward="false" selection-start-line="46" selection-start-column="12" selection-end-line="46" selection-end-column="12" />
               <folding>
                 <element signature="e#46#61#0" expanded="true" />
-                <element signature="e#724#856#0" expanded="false" />
-                <element signature="e#997#1086#0" expanded="false" />
-                <element signature="e#1229#1291#0" expanded="false" />
-                <element signature="e#1438#1518#0" expanded="false" />
-                <element signature="e#9872#10159#0" expanded="false" />
-                <element signature="e#10312#10552#0" expanded="false" />
-                <element signature="e#10714#11455#0" expanded="false" />
-                <element signature="e#14840#14958#0" expanded="false" />
+                <element signature="e#754#886#0" expanded="false" />
+                <element signature="e#1029#1097#0" expanded="false" />
+                <element signature="e#2316#10155#0" expanded="false" />
+                <element signature="e#10308#10595#0" expanded="false" />
+                <element signature="e#10748#10988#0" expanded="false" />
+                <element signature="e#11150#11891#0" expanded="false" />
+                <element signature="e#12053#15114#0" expanded="false" />
+                <element signature="e#15276#15394#0" expanded="false" />
               </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="MigrationApplication.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/MigrationApplication.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="952">
+              <caret line="56" column="0" lean-forward="false" selection-start-line="56" selection-start-column="0" selection-end-line="58" selection-end-column="0" />
+              <folding />
             </state>
           </provider>
         </entry>
@@ -59,6 +71,7 @@
       <find>EAS</find>
       <find>IQRF</find>
       <find>bytes</find>
+      <find>print</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -128,7 +141,6 @@
     </navigator>
     <panes>
       <pane id="Scope" />
-      <pane id="Scratches" />
       <pane id="ProjectPane">
         <subPane>
           <PATH>
@@ -181,6 +193,7 @@
           </PATH>
         </subPane>
       </pane>
+      <pane id="Scratches" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -444,7 +457,7 @@
     <frame x="-8" y="-8" width="1936" height="1186" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.07239583" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.1296875" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.26301116" sideWeight="0.50208336" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
@@ -459,7 +472,7 @@
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Find" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.32992566" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
     </layout>
     <layout-to-restore>
@@ -487,7 +500,7 @@
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
-      <option name="time" value="20" />
+      <option name="time" value="21" />
     </breakpoint-manager>
     <watches-manager />
   </component>
@@ -762,35 +775,35 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/MigrationApplication.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="283">
-          <caret line="83" column="16" lean-forward="false" selection-start-line="83" selection-start-column="16" selection-end-line="83" selection-end-column="39" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/functions/encrypt-decrypt-aes.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="85">
           <caret line="7" column="0" lean-forward="false" selection-start-line="7" selection-start-column="0" selection-end-line="7" selection-end-column="69" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/MigrationApplication.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="952">
+          <caret line="56" column="0" lean-forward="false" selection-start-line="56" selection-start-column="0" selection-end-line="58" selection-end-column="0" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/MainApplication.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="204">
-          <caret line="227" column="8" lean-forward="false" selection-start-line="227" selection-start-column="8" selection-end-line="227" selection-end-column="8" />
+        <state relative-caret-position="410">
+          <caret line="46" column="12" lean-forward="false" selection-start-line="46" selection-start-column="12" selection-end-line="46" selection-end-column="12" />
           <folding>
             <element signature="e#46#61#0" expanded="true" />
-            <element signature="e#724#856#0" expanded="false" />
-            <element signature="e#997#1086#0" expanded="false" />
-            <element signature="e#1229#1291#0" expanded="false" />
-            <element signature="e#1438#1518#0" expanded="false" />
-            <element signature="e#9872#10159#0" expanded="false" />
-            <element signature="e#10312#10552#0" expanded="false" />
-            <element signature="e#10714#11455#0" expanded="false" />
-            <element signature="e#14840#14958#0" expanded="false" />
+            <element signature="e#754#886#0" expanded="false" />
+            <element signature="e#1029#1097#0" expanded="false" />
+            <element signature="e#2316#10155#0" expanded="false" />
+            <element signature="e#10308#10595#0" expanded="false" />
+            <element signature="e#10748#10988#0" expanded="false" />
+            <element signature="e#11150#11891#0" expanded="false" />
+            <element signature="e#12053#15114#0" expanded="false" />
+            <element signature="e#15276#15394#0" expanded="false" />
           </folding>
         </state>
       </provider>

@@ -4,10 +4,10 @@ import binascii
 import os
 
 # Nacti co je potreba
-TELEGRAM_DECRYPTED = binascii.unhexlify('1AB94C4FDA694309E347E86FA437790C')
-AES_KEY_IQRF = binascii.unhexlify('2B7E151628AED2A6ABF7158809CF4F3C')
+TELEGRAM_DECRYPTED = binascii.unhexlify('46027F366AB9B77C8AF39ED0E483CFDF')
+AES_KEY_IQRF = binascii.unhexlify('FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF')
 AES_KEY_DEVICE = binascii.unhexlify('2B7E151628AED2A6ABF7158809CF4F3C')
-AES_IV = binascii.unhexlify('EE092101000001064F4F4F4F4F4F4F4F')
+AES_IV = binascii.unhexlify('EE09210100000106EDEDEDEDEDEDEDED')
 
 # Vsechno nad velkymi pismeny
 binascii.hexlify(AES_IV).upper()

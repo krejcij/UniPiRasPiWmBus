@@ -7,6 +7,8 @@ import sys, getopt
 global db
 global file
 global demo_run
+global AES_IQRF_KLIC_DEMO_TELEGRAMU
+AES_IQRF_KLIC_DEMO_TELEGRAMU = 'FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF'
 
 try:
     from Crypto.Cipher import AES
@@ -50,9 +52,8 @@ def output(output):
     print(time.strftime("%d/%m/%Y  %H:%M:%S  ") + output)
     return
 
-
 ############ Parsovani jednotliveho telegramu ##########################################################################
-def parse_telegram(parsedstring):
+def parse_telegram(parsedstring,RunType):
     output("Received telegram: " + parsedstring)
     errors = ''
     sensor_sn = LSB(parsedstring[12:20])
@@ -62,53 +63,56 @@ def parse_telegram(parsedstring):
     device = parsedstring[8:24].upper()
 
     increment = str(int(parsedstring[26:28], 16)).rjust(3, ' ')
+    access = str(parsedstring[26:28])
 
     rssi = get_signal_value(parsedstring[-4:-2])
 
     if(demo_run != True):
         # Get actual IQRF key
         ser.write("\x00\x00>03?\x0D")
-        iqrf_key = ser.readline()
-        output("Actual AES key is: " + iqrf_key[1:])
+        AES_KEY_IQRF = ser.readline()
+        output("Actual AES key is: " + AES_KEY_IQRF[1:].upper())
     else:
-        iqrf_key = "-"
-
-    sql("INSERT INTO TELEGRAMS (DATETIME,PRE,HEADER,DATA,POST,AESKEY) VALUES ('"+time.strftime("%Y-%m-%d %H:%M")+"', '"+parsedstring[0:4]+"', '"+parsedstring[4:34]+"', '"+parsedstring[34:-4]+"', '"+parsedstring[-4:]+"','"+iqrf_key+"')")
+        AES_KEY_IQRF = binascii.unhexlify(AES_IQRF_KLIC_DEMO_TELEGRAMU) #DEFAULT AES IQRF KEY
+        sql("INSERT INTO TELEGRAMS (DATETIME,PRE,HEADER,DATA,POST,AESKEY) VALUES ('"+time.strftime("%Y-%m-%d %H:%M")+"', '"+parsedstring[0:4]+"', '"+parsedstring[4:34]+"', '"+parsedstring[34:-4]+"', '"+parsedstring[-4:]+"','"+AES_IQRF_KLIC_DEMO_TELEGRAMU+"')")
 
     ############ Rozsifrujeme zasifrovany telegram #####################################################################
     configuration_field = parsedstring[33:34]
     if (configuration_field == '5'):
         aes = True
 
-        # Nacti co je potreba
+        # Nacti sifrovanou cast dat z prichoziho paketu
         TELEGRAM_DECRYPTED = binascii.unhexlify(parsedstring[34:-4])
-        # print(binascii.hexlify(TELEGRAM_DECRYPTED).upper())
-        # AES_KEY_IQRF = binascii.unhexlify('2B7E151628AED2A6ABF7158809CF4F3C')
-        # AES_KEY_DEVICE = binascii.unhexlify('2B7E151628AED2A6ABF7158809CF4F3C') #BONEGA
-        AES_KEY_DEVICE = binascii.unhexlify('D8F378729241F6883DA548881A5524F6')  # KAMSTRUP
-        AES_IV = binascii.unhexlify('2D2C964363601304D2D2D2D2D2D2D2D2')
+        # Nacti prislusny sifrovaci klic daneho zarizeni z DB
+        vysledky = db.execute("SELECT `DEVICE_AES` FROM `DEVICES` WHERE `DEVICE_ADDRESS` LIKE '%"+device+"%' LIMIT 1;")
+        vysledek = vysledky.fetchone()
+        AES_KEY_DEVICE = binascii.unhexlify(vysledek[0])
+        # Sestav inicializacni vektor z prichoziho paketu
+        AES_IV=binascii.unhexlify(device+access*8).strip()
 
         # Vsechno nad velkymi pismeny
         binascii.hexlify(AES_IV).upper()
-        # binascii.hexlify(AES_KEY_IQRF).upper()
+        binascii.hexlify(AES_KEY_IQRF).upper()
         binascii.hexlify(AES_KEY_DEVICE).upper()
         binascii.hexlify(TELEGRAM_DECRYPTED).upper()
 
         # Vem telegram rozsifrovany univerzalnim klicem (AES klic zadany v IQRF) a zpet ho s nim zasifruj. Dostaneme sprave prenaseny telegram.
-        # encryptor_back = AES.new(AES_KEY_IQRF, AES.MODE_CBC, IV=AES_IV)
-        # TELEGRAM_CRYPTED = encryptor_back.encrypt(TELEGRAM_DECRYPTED)
-        TELEGRAM_CRYPTED = TELEGRAM_DECRYPTED
+        if (RunType!='aes_clean'):
+            encryptor_back = AES.new(AES_KEY_IQRF, AES.MODE_CBC, IV=AES_IV)
+            TELEGRAM_CRYPTED = encryptor_back.encrypt(TELEGRAM_DECRYPTED)
+        else:
+            TELEGRAM_CRYPTED = TELEGRAM_DECRYPTED
 
         # Ten ted rozsifrujeme spravnym klicem (AES klic daneho zarizeni), dostaneme nesifrovana data.
         encryptor_new = AES.new(AES_KEY_DEVICE, AES.MODE_CBC, IV=AES_IV)
         TELEGRAM_ORIGINAL = encryptor_new.decrypt(TELEGRAM_CRYPTED)
 
         # Pro kontrolu to vypiseme
-        # print(binascii.hexlify(TELEGRAM_DECRYPTED).upper())
-        # print(binascii.hexlify(TELEGRAM_CRYPTED).upper())
-        # print(binascii.hexlify(TELEGRAM_ORIGINAL).upper())
-
-        # print(binascii.hexlify(TELEGRAM_ORIGINAL).upper())
+        print(bytes("AES_IV: ",'UTF-8')+binascii.hexlify(AES_IV))
+        print(bytes("AES_DEVICE: ",'UTF-8')+binascii.hexlify(AES_KEY_DEVICE))
+        print(bytes("AES_TEL_DECRYPTED: ",'UTF-8')+binascii.hexlify(TELEGRAM_DECRYPTED))
+        print(bytes("AES_TEL_CRYPTED: ",'UTF-8')+binascii.hexlify(TELEGRAM_CRYPTED))
+        print(bytes("AES_TEL_ORIGINAL: ",'UTF-8')+binascii.hexlify(TELEGRAM_ORIGINAL))
 
         aes_control = binascii.hexlify(TELEGRAM_ORIGINAL[0:2]).upper()
         if (aes_control != b'2F2F'):
@@ -178,7 +182,6 @@ def parse_telegram(parsedstring):
                 aes).ljust(5, ' ') + "   Telegram structure not supported. " + errors)
     return
 
-
 ############################ Vypocitani data ve formatu G ##############################################################
 def get_date(date_bytes):
     date = str(bin(int(date_bytes[0:2], 16))[2:]).zfill(8) + str(bin(int(date_bytes[2:4], 16))[2:]).zfill(8)
@@ -222,18 +225,22 @@ def get_demo_telegrams(demo_type):
     words = []
 
     if (demo_type == "aes_iqrf"):
-        # WEPTECH AES
-        words.append("32002E44B05C10000000021B7A2B082005AC68E7F50EE6507BBE2D9F219C4F628B5899B9CD54239872373114E372C59E817DCF")  # ME
-        words.append("32002E44B05C10000000021B7A2C0820051D2B70A744ACD71B237CF8F6C54C1A7A2E0DE2F24C9225E4BB0FB278C8A68CF77985")  # ME
-        words.append("32002E44B05C10000000021B7A2D0820058FBFB2CE35F67F9F66E00E751BBBF5271E07F63C09BBAA77CDA574D6A0D672477C6E")  # ME
         # BONEGA AES
-        words.append("22001E44EE092101000001077A43001005C8C16D2F1F1DBDD884515FC9E4905B357C9C")  # ME
-        words.append("22001E44EE092101000001067A430010051DBBA0F32262EBC81D9AF8F70CB8FB7E6ED5")  # ME
-        words.append("22001E44EE092101000001077A44001005D3CCF20F690F2A9F3E6C6DC5CC32429F760C")  # ME
-        words.append("22001E44EE092101000001067A440010055A5E995023C09D3756726C09C57B5DE27621")  # ME
-        words.append("22001E44EE092101000001077A4500100578261B54AC056DC59A34EFABB7680580794A")  # ME
+        words.append("22001E44EE092101000001067AED00100546027F366AB9B77C8AF39ED0E483CFDF1234")  # ME
+        #words.append("22001E44EE092101000001077AEE001005308C0D6214F75FCB1C92B247AA2BBB481234")  # ME
+        #words.append("22001E44EE092101000001067AEE001005D8B29F90ADA53B75D6E0A882AF0B62E41234")  # ME
+        #words.append("22001E44EE092101000001077AEF0010052751EC0CB5EE06339F4610E564554A8E1234")  # ME
+        #words.append("22001E44EE092101000001067AEF001005FDC98128F488C529F8F0A2CB9EE25EF81234")  # ME
+        #words.append("22001E44EE092101000001077AF0001005CB79F8422323895DA8C0FA7185B9B80B1234")  # ME
+        # WEPTECH AES
+        #words.append("32002E44B05C10000000021B7A0618200517BEC2259D319C81004EC1C65366CF3FAACD81C07774C950761CEC51AE26E2751234")  # ME
+        #words.append("32002E44B05C10000000021B7A0818200540BC9C5672277EFD30E7508479CBE9215D6AA469F53B42A5DB3AB6F120F2205D1234")  # ME
+        #words.append("32002E44B05C10000000021B7A08182005C2D901432A0617F274AFB0CAE42A0A6377F70AE1BB52C6A57301B49AC72CFAE41234")  # ME
+        #words.append("32002E44B05C10000000021B7A0A182005F9031AF7B93B04732C332EF55D20A3C7B5303F461486A8FC87AE4982A857BA751234")  # ME
+        #words.append("32002E44B05C10000000021B7A0A1820050717C71E23B30C799B0E16ABFCDAD6A84487B368D58226382529656F0495BE961234")  # ME
     elif (demo_type == "aes_clean"):
         # BONEGA AES
+        words.append("22001E44EE092101000001077A4F0010051AB94C4FDA694309E347E86FA437790C1234")  # ME
         words.append("22001E44EE092101000001067A4F0010051AB94C4FDA694309E347E86FA437790C6ED5")  # KZ
         # KAMSTRUP AES
         words.append("00005E442D2C9643636013047AD210500584535BEF5623858243FF4961635B6D30017FE12743EEC8D5757B0A3EC5E0BB052ABDBF71A75179A1340D01389E144F861F56780A3F8E1543E2368676A7BDC26214D2330757F0684421A3D5B1E4C781B84231")  # AH
@@ -241,15 +248,15 @@ def get_demo_telegrams(demo_type):
         # BONEGA
         words.append("22001E44EE092101000001067A4F0010002F2F04131A220000046D0328C4162F2F6ED5")  # ME
         words.append("22001E44EE092101000001077A4F0010002F2F04131A220000046D0328C4162F2F6ED5")  # ME
+        # WEPTECH
+        words.append("32002E44B05C11000000021B7A920800002F2F0A6667020AFB1A560402FD971D01002F2F2F2F2F2F2F2F2F2F2F2F2F2F2F1234")  # KZ
+        words.append("32002e44b05c10000000021b7a660800002f2f0a6690010afb1a090302fd971d01002f2f2f2f2f2f2f2f2f2f2f2f2f2f2f8769")  # ME
+        # KAMSTUP
+        words.append("00005E442D2C9643636013047AD21000002F2F0422BA11000004140F000000043B0000000002FD1700100259A50A026CB316426CBF1544140F000000040F02000000025DAF0A04FF070600000004FF0802000000440F020000002F2F2F2F2F2F2F1234")  # AH
         # ZPA
         words.append("00002A44016A4493671201027244936712016A01020000002086108300762385010000862083009731920000001234")  # KZ
         words.append("00002A44016A4742750101027247427501016A01020000002086108300B80B0000000086208300F82A000000009658")  # PM
         words.append("2e002a44016a4742750101027247427501016a01021b00002086108300b80b0000000086208300f82a000000008cd4")  # JA
-        # WEPTECH CLEAN
-        words.append("32002E44B05C11000000021B7A920800002F2F0A6667020AFB1A560402FD971D01002F2F2F2F2F2F2F2F2F2F2F2F2F2F2F1234")  # KZ
-        words.append("32002e44b05c10000000021b7a660800002f2f0a6690010afb1a090302fd971d01002f2f2f2f2f2f2f2f2f2f2f2f2f2f2f8769")  # ME
-        # KAMSTUP CLEAN
-        words.append("00005E442D2C9643636013047AD21000002F2F0422BA11000004140F000000043B0000000002FD1700100259A50A026CB316426CBF1544140F000000040F02000000025DAF0A04FF070600000004FF0802000000440F020000002F2F2F2F2F2F2F1234")  # AH
     return words
 
 ############### Vypocitani RSSI v dBm z (-3,-4) ########################################################################
@@ -257,7 +264,6 @@ def get_signal_value(sensor_rssi):
     sensor_rssi = int(sensor_rssi, 16)
     sensor_rssi = (sensor_rssi / 2) - 130
     return str(sensor_rssi).rjust(6, ' ')
-
 
 ########################################################################################################################
 ########################################################################################################################
@@ -289,11 +295,10 @@ if (len(args) > 0):
 if (demo_run == True):
     output("Running in demonstration (" + args[0] + ") mode.")
     words = get_demo_telegrams(args[0])
-    aes_iqrf = "000102030405060708090A0B0C0D0E0F"
     wordLed = len(words)
     errors = ''
     for i in range(0, wordLed):
-        parse_telegram(str(words[i]))
+        parse_telegram(str(words[i]),args[0])
 else:
     # Setup a serial port
     ser = serial.Serial(
@@ -325,7 +330,7 @@ else:
         readedstring = str(readedstring)
 
         if readedstring:
-            parse_telegram(readedstring)
+            parse_telegram(readedstring,args[0])
 
 ############ Ukoncime hrani ############################################################################################
 try:

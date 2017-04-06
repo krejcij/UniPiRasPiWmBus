@@ -5,7 +5,6 @@
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/MainDatabase.db" afterPath="$PROJECT_DIR$/MainDatabase.db" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/MainApplication.py" afterPath="$PROJECT_DIR$/MainApplication.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/functions/encrypt-decrypt-aes.py" afterPath="$PROJECT_DIR$/functions/encrypt-decrypt-aes.py" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -23,31 +22,19 @@
       <file leaf-file-name="MainApplication.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/MainApplication.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-184">
-              <caret line="10" column="65" lean-forward="false" selection-start-line="10" selection-start-column="65" selection-end-line="10" selection-end-column="65" />
+            <state relative-caret-position="204">
+              <caret line="227" column="8" lean-forward="false" selection-start-line="227" selection-start-column="8" selection-end-line="227" selection-end-column="8" />
               <folding>
                 <element signature="e#46#61#0" expanded="true" />
                 <element signature="e#724#856#0" expanded="false" />
                 <element signature="e#997#1086#0" expanded="false" />
                 <element signature="e#1229#1291#0" expanded="false" />
                 <element signature="e#1438#1518#0" expanded="false" />
-                <element signature="e#1687#9728#0" expanded="false" />
-                <element signature="e#9881#10168#0" expanded="false" />
-                <element signature="e#10321#10561#0" expanded="false" />
-                <element signature="e#10723#11464#0" expanded="false" />
-                <element signature="e#11626#14696#0" expanded="false" />
-                <element signature="e#14858#14976#0" expanded="false" />
+                <element signature="e#9872#10159#0" expanded="false" />
+                <element signature="e#10312#10552#0" expanded="false" />
+                <element signature="e#10714#11455#0" expanded="false" />
+                <element signature="e#14840#14958#0" expanded="false" />
               </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="encrypt-decrypt-aes.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/functions/encrypt-decrypt-aes.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="85">
-              <caret line="7" column="0" lean-forward="false" selection-start-line="7" selection-start-column="0" selection-end-line="7" selection-end-column="69" />
-              <folding />
             </state>
           </provider>
         </entry>
@@ -140,6 +127,8 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
+      <pane id="Scope" />
+      <pane id="Scratches" />
       <pane id="ProjectPane">
         <subPane>
           <PATH>
@@ -192,8 +181,6 @@
           </PATH>
         </subPane>
       </pane>
-      <pane id="Scratches" />
-      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -779,7 +766,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="283">
           <caret line="83" column="16" lean-forward="false" selection-start-line="83" selection-start-column="16" selection-end-line="83" selection-end-column="39" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -793,20 +779,18 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/MainApplication.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-184">
-          <caret line="10" column="65" lean-forward="false" selection-start-line="10" selection-start-column="65" selection-end-line="10" selection-end-column="65" />
+        <state relative-caret-position="204">
+          <caret line="227" column="8" lean-forward="false" selection-start-line="227" selection-start-column="8" selection-end-line="227" selection-end-column="8" />
           <folding>
             <element signature="e#46#61#0" expanded="true" />
             <element signature="e#724#856#0" expanded="false" />
             <element signature="e#997#1086#0" expanded="false" />
             <element signature="e#1229#1291#0" expanded="false" />
             <element signature="e#1438#1518#0" expanded="false" />
-            <element signature="e#1687#9728#0" expanded="false" />
-            <element signature="e#9881#10168#0" expanded="false" />
-            <element signature="e#10321#10561#0" expanded="false" />
-            <element signature="e#10723#11464#0" expanded="false" />
-            <element signature="e#11626#14696#0" expanded="false" />
-            <element signature="e#14858#14976#0" expanded="false" />
+            <element signature="e#9872#10159#0" expanded="false" />
+            <element signature="e#10312#10552#0" expanded="false" />
+            <element signature="e#10714#11455#0" expanded="false" />
+            <element signature="e#14840#14958#0" expanded="false" />
           </folding>
         </state>
       </provider>

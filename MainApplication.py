@@ -173,17 +173,16 @@ def parse_telegram(parsedstring):
         # sql("INSERT INTO MEASURES (DATETIME,DEVICE,RSSI,TYPE1,VALUE1,TYPE2,VALUE2) VALUES ('" + time.strftime("%Y-%m-%d %H:%M") + "', '" + device + "', '" + rssi + "', 'Wh', '" + value1 + "','Wh','"+value2+"')")
         output(
             "Mereni: " + increment + "  Senzor: " + sensor_manu + "." + sensor_type + "." + sensor_sn + "." + sensor_ver + "    RSSI: " + rssi + "dB     AES: " + str(
-                aes).ljust(5, ' ') + "   Teplota: " + Teplota1 +"/"+ Teplota2 + "°C   Energie: " + Energie1 + "/" + Energie2 + "MJ  Prutok: " + Prutok +"m3/hod")
+                aes).ljust(5, ' ') + "   Teplota: " + Teplota1 +"/"+ Teplota2 + "°C   Energie: " + Energie1 + "/" + Energie2 + "MJ  Prutok: " + Prutok +"m3/hod"  + errors)
 
     elif (sensor_manu == "ZPA"):
-        value1 = parsedstring[58:70]
-        value2 = parsedstring[78:88]
-        # !!!rozhexovat hodnoty (asi) a doplnit vytup dle DIF a VIF
+        Spotreba1 = str(int(LSB(parsedstring[58:70]), 16)/1000)
+        Spotreba2 = str(int(LSB(parsedstring[78:88]), 16)/1000)
         sql("INSERT INTO MEASURES (DATETIME,DEVICE,RSSI,TYPE1,VALUE1,TYPE2,VALUE2) VALUES ('" + time.strftime(
-            "%Y-%m-%d %H:%M") + "', '" + device + "', '" + rssi + "', 'Wh', '" + value1 + "','Wh','"+value2+"')")
+            "%Y-%m-%d %H:%M") + "', '" + device + "', '" + rssi + "', 'kWh', '" + Spotreba1 + "','kWh','"+Spotreba2+"')")
         output(
             "Mereni: " + increment + "  Senzor: " + sensor_manu + "." + sensor_type + "." + sensor_sn + "." + sensor_ver + "    RSSI: " + rssi + "dB     AES: " + str(
-                aes).ljust(5, ' ') + "   Tarif 1: " + LSB(value1) + "Wh   Tarif 2: " + LSB(value2) + "Wh" + errors)
+                aes).ljust(5, ' ') + "   Spotreba T1: " + Spotreba1 + "kWh   Spotreba T2: " + Spotreba2 + "kWh" + errors)
     else:
         output(
             "Mereni: " + increment + "  Senzor: " + sensor_manu + "." + sensor_type + "." + sensor_sn + "." + sensor_ver + "    RSSI: " + rssi + "dB     AES: " + str(
@@ -220,7 +219,6 @@ def get_vendor_name(vendor_input):
     znak2 = chr(vendor_char2)
     znak3 = chr(vendor_char3)
     return znak1 + znak2 + znak3
-
 
 ############### Demonstracni hodnoty telegramu pro offline ukazku ci testy #############################################
 def get_demo_telegrams(demo_type):
@@ -263,7 +261,6 @@ def get_demo_telegrams(demo_type):
         words.append(
             "00005E442D2C9643636013047AD21000002F2F0422BA11000004140F000000043B0000000002FD1700100259A50A026CB316426CBF1544140F000000040F02000000025DAF0A04FF070600000004FF0802000000440F020000002F2F2F2F2F2F2F1234")  # AH
     return words
-
 
 ############### Vypocitani RSSI v dBm z (-3,-4) ########################################################################
 def get_signal_value(sensor_rssi):

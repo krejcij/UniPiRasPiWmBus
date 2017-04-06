@@ -56,7 +56,6 @@ def parse_telegram(parsedstring):
     output("Received telegram: " + parsedstring)
     errors = ''
     sensor_sn = LSB(parsedstring[12:20])
-    print(sensor_sn)
     sensor_ver = parsedstring[20:22]
     sensor_type = parsedstring[22:24]
     sensor_manu = get_vendor_name(parsedstring[8:12])

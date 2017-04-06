@@ -3,9 +3,7 @@
   <component name="ChangeListManager">
     <list default="true" id="c48d3ae6-f19b-4b05-9a0f-869383ac9eb4" name="Default" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/MainDatabase.db" afterPath="$PROJECT_DIR$/MainDatabase.db" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/MainApplication.py" afterPath="$PROJECT_DIR$/MainApplication.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/README.md" afterPath="$PROJECT_DIR$/README.md" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -23,19 +21,18 @@
       <file leaf-file-name="MainApplication.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/MainApplication.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="73">
-              <caret line="221" column="34" lean-forward="false" selection-start-line="221" selection-start-column="34" selection-end-line="221" selection-end-column="34" />
+            <state relative-caret-position="544">
+              <caret line="58" column="0" lean-forward="false" selection-start-line="58" selection-start-column="0" selection-end-line="58" selection-end-column="0" />
               <folding>
                 <element signature="e#46#61#0" expanded="true" />
                 <element signature="e#622#754#0" expanded="false" />
                 <element signature="e#895#984#0" expanded="false" />
                 <element signature="e#1336#1416#0" expanded="false" />
-                <element signature="e#9406#9693#0" expanded="false" />
-                <element signature="e#9846#10086#0" expanded="false" />
-                <element signature="e#10248#10989#0" expanded="false" />
-                <element signature="e#11151#13755#0" expanded="false" />
-                <element signature="e#13917#14035#0" expanded="false" />
-                <element signature="e#15546#15805#0" expanded="false" />
+                <element signature="e#9385#9672#0" expanded="false" />
+                <element signature="e#9825#10065#0" expanded="false" />
+                <element signature="e#10227#10968#0" expanded="false" />
+                <element signature="e#13896#14014#0" expanded="false" />
+                <element signature="e#15525#15784#0" expanded="false" />
               </folding>
             </state>
           </provider>
@@ -126,7 +123,6 @@
     </navigator>
     <panes>
       <pane id="Scratches" />
-      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <PATH>
@@ -179,6 +175,7 @@
           </PATH>
         </subPane>
       </pane>
+      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -447,18 +444,18 @@
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.26301116" sideWeight="0.50208336" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.26301116" sideWeight="0.49791667" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.39962825" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.26301116" sideWeight="0.49791667" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.39962825" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
     </layout>
     <layout-to-restore>
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
@@ -776,19 +773,18 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/MainApplication.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="73">
-          <caret line="221" column="34" lean-forward="false" selection-start-line="221" selection-start-column="34" selection-end-line="221" selection-end-column="34" />
+        <state relative-caret-position="544">
+          <caret line="58" column="0" lean-forward="false" selection-start-line="58" selection-start-column="0" selection-end-line="58" selection-end-column="0" />
           <folding>
             <element signature="e#46#61#0" expanded="true" />
             <element signature="e#622#754#0" expanded="false" />
             <element signature="e#895#984#0" expanded="false" />
             <element signature="e#1336#1416#0" expanded="false" />
-            <element signature="e#9406#9693#0" expanded="false" />
-            <element signature="e#9846#10086#0" expanded="false" />
-            <element signature="e#10248#10989#0" expanded="false" />
-            <element signature="e#11151#13755#0" expanded="false" />
-            <element signature="e#13917#14035#0" expanded="false" />
-            <element signature="e#15546#15805#0" expanded="false" />
+            <element signature="e#9385#9672#0" expanded="false" />
+            <element signature="e#9825#10065#0" expanded="false" />
+            <element signature="e#10227#10968#0" expanded="false" />
+            <element signature="e#13896#14014#0" expanded="false" />
+            <element signature="e#15525#15784#0" expanded="false" />
           </folding>
         </state>
       </provider>

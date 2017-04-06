@@ -137,24 +137,14 @@ def parse_telegram(parsedstring):
                 aes).ljust(5, ' ') + "   Teplota: " + temperature.rjust(5, ' ') + "°C    Vlhkost: " + humidity.rjust(5,
                                                                                                                      ' ') + "%     " + errors)
     elif (sensor_manu == "BON"):
-        counter = parsedstring[48:50] + parsedstring[46:48] + parsedstring[44:46] + parsedstring[42:44]
-        counter = str(int(counter, 16))
-        bontime = str(bin(int(parsedstring[54:56], 16))[2:]).zfill(8) + str(
-            bin(int(parsedstring[56:58], 16))[2:]).zfill(8)
-        bondate = str(bin(int(parsedstring[58:60], 16))[2:]).zfill(8) + str(
-            bin(int(parsedstring[60:62], 16))[2:]).zfill(8)
-        minutes = str(int(bontime[2:8], 2))
-        hours = str(int(bontime[11:16], 2))
-        year1 = str(int(bondate[0:3], 2))
-        year2 = str(int(bondate[8:12], 2))
-        day = str(int(bondate[3:8], 2))
-        month = str(int(bondate[12:16], 2))
-        cascteni = hours + ":" + minutes.zfill(2) + " " + day + "." + month + ".20" + year2 + year1
+        Spotreba = str(int(LSB(parsedstring[42:46]), 16))
+        Cascteni = get_date(LSB(parsedstring[58:62])) + " " + get_time(LSB(parsedstring[54:58]))
+
         sql("INSERT INTO MEASURES (DATETIME,DEVICE,RSSI,TYPE1,VALUE1,TYPE2,VALUE2) VALUES ('" + time.strftime(
-            "%Y-%m-%d %H:%M") + "', '" + device + "', '" + rssi + "', 'l', '" + counter + "','Odecet','"+cascteni+"')")
+            "%Y-%m-%d %H:%M") + "', '" + device + "', '" + rssi + "', 'l', '" + Spotreba + "','Odecet','"+Cascteni+"')")
         output(
             "Mereni: " + increment + "  Senzor: " + sensor_manu + "." + sensor_type + "." + sensor_sn + "." + sensor_ver + "    RSSI: " + rssi + "dB     AES: " + str(
-                aes).ljust(5, ' ') + "   Průtok: " + counter.rjust(7, ' ') + "l    Cas: " + cascteni + errors)
+                aes).ljust(5, ' ') + "   Spotřeba: " + Spotreba.rjust(7, ' ') + "l    Cas: " + Cascteni + errors)
     elif (sensor_manu == "KAM"):
         #DobaBehu = int(LSB(parsedstring[42:50]),16)
         #Prurez1 = int(LSB(parsedstring[54:62]), 16)
@@ -190,13 +180,21 @@ def parse_telegram(parsedstring):
     return
 
 
-############################ Vypocitani data ve formatu F ##############################################################
+############################ Vypocitani data ve formatu G ##############################################################
 def get_date(date_bytes):
     date = str(bin(int(date_bytes[0:2], 16))[2:]).zfill(8) + str(bin(int(date_bytes[2:4], 16))[2:]).zfill(8)
     year = str(int(date[0:4]+date[8:11], 2))
     month = str(int(date[4:8], 2))
     day = str(int(date[11:16], 2))
     vysledek = day + "." + month + ".20" + year
+    return vysledek
+
+############################ Vypocitani casu ve formatu F ##############################################################
+def get_time(time_bytes):
+    time = str(bin(int(time_bytes[0:2], 16))[2:]).zfill(8) + str(bin(int(time_bytes[2:4], 16))[2:]).zfill(8)
+    hour = str(int(time[3:8], 2))
+    minute = str(int(time[10:16], 2)).zfill(2)
+    vysledek = hour + ":" + minute
     return vysledek
 
 ############### Vypocitani VendorID z M-Pole ###########################################################################
@@ -226,12 +224,9 @@ def get_demo_telegrams(demo_type):
 
     if (demo_type == "aes_iqrf"):
         # WEPTECH AES
-        words.append(
-            "32002E44B05C10000000021B7A2B082005AC68E7F50EE6507BBE2D9F219C4F628B5899B9CD54239872373114E372C59E817DCF")  # ME
-        words.append(
-            "32002E44B05C10000000021B7A2C0820051D2B70A744ACD71B237CF8F6C54C1A7A2E0DE2F24C9225E4BB0FB278C8A68CF77985")  # ME
-        words.append(
-            "32002E44B05C10000000021B7A2D0820058FBFB2CE35F67F9F66E00E751BBBF5271E07F63C09BBAA77CDA574D6A0D672477C6E")  # ME
+        words.append("32002E44B05C10000000021B7A2B082005AC68E7F50EE6507BBE2D9F219C4F628B5899B9CD54239872373114E372C59E817DCF")  # ME
+        words.append("32002E44B05C10000000021B7A2C0820051D2B70A744ACD71B237CF8F6C54C1A7A2E0DE2F24C9225E4BB0FB278C8A68CF77985")  # ME
+        words.append("32002E44B05C10000000021B7A2D0820058FBFB2CE35F67F9F66E00E751BBBF5271E07F63C09BBAA77CDA574D6A0D672477C6E")  # ME
         # BONEGA AES
         words.append("22001E44EE092101000001077A43001005C8C16D2F1F1DBDD884515FC9E4905B357C9C")  # ME
         words.append("22001E44EE092101000001067A430010051DBBA0F32262EBC81D9AF8F70CB8FB7E6ED5")  # ME
@@ -242,24 +237,20 @@ def get_demo_telegrams(demo_type):
         # BONEGA AES
         words.append("22001E44EE092101000001067A4F0010051AB94C4FDA694309E347E86FA437790C6ED5")  # KZ
         # KAMSTRUP AES
-        words.append(
-            "00005E442D2C9643636013047AD210500584535BEF5623858243FF4961635B6D30017FE12743EEC8D5757B0A3EC5E0BB052ABDBF71A75179A1340D01389E144F861F56780A3F8E1543E2368676A7BDC26214D2330757F0684421A3D5B1E4C781B84231")  # AH
+        words.append("00005E442D2C9643636013047AD210500584535BEF5623858243FF4961635B6D30017FE12743EEC8D5757B0A3EC5E0BB052ABDBF71A75179A1340D01389E144F861F56780A3F8E1543E2368676A7BDC26214D2330757F0684421A3D5B1E4C781B84231")  # AH
     elif (demo_type == "clean"):
+        # BONEGA
+        words.append("22001E44EE092101000001067A4F0010002F2F04131A220000046D0328C4162F2F6ED5")  # ME
+        words.append("22001E44EE092101000001077A4F0010002F2F04131A220000046D0328C4162F2F6ED5")  # ME
         # ZPA
-        words.append(
-            "00002A44016A4493671201027244936712016A01020000002086108300762385010000862083009731920000001234")  # KZ
-        words.append(
-            "00002A44016A4742750101027247427501016A01020000002086108300B80B0000000086208300F82A000000009658")  # PM
-        words.append(
-            "2e002a44016a4742750101027247427501016a01021b00002086108300b80b0000000086208300f82a000000008cd4")  # JA
+        words.append("00002A44016A4493671201027244936712016A01020000002086108300762385010000862083009731920000001234")  # KZ
+        words.append("00002A44016A4742750101027247427501016A01020000002086108300B80B0000000086208300F82A000000009658")  # PM
+        words.append("2e002a44016a4742750101027247427501016a01021b00002086108300b80b0000000086208300f82a000000008cd4")  # JA
         # WEPTECH CLEAN
-        words.append(
-            "32002E44B05C11000000021B7A920800002F2F0A6667020AFB1A560402FD971D01002F2F2F2F2F2F2F2F2F2F2F2F2F2F2F1234")  # KZ
-        words.append(
-            "32002e44b05c10000000021b7a660800002f2f0a6690010afb1a090302fd971d01002f2f2f2f2f2f2f2f2f2f2f2f2f2f2f8769")  # ME
+        words.append("32002E44B05C11000000021B7A920800002F2F0A6667020AFB1A560402FD971D01002F2F2F2F2F2F2F2F2F2F2F2F2F2F2F1234")  # KZ
+        words.append("32002e44b05c10000000021b7a660800002f2f0a6690010afb1a090302fd971d01002f2f2f2f2f2f2f2f2f2f2f2f2f2f2f8769")  # ME
         # KAMSTUP CLEAN
-        words.append(
-            "00005E442D2C9643636013047AD21000002F2F0422BA11000004140F000000043B0000000002FD1700100259A50A026CB316426CBF1544140F000000040F02000000025DAF0A04FF070600000004FF0802000000440F020000002F2F2F2F2F2F2F1234")  # AH
+        words.append("00005E442D2C9643636013047AD21000002F2F0422BA11000004140F000000043B0000000002FD1700100259A50A026CB316426CBF1544140F000000040F02000000025DAF0A04FF070600000004FF0802000000440F020000002F2F2F2F2F2F2F1234")  # AH
     return words
 
 ############### Vypocitani RSSI v dBm z (-3,-4) ########################################################################

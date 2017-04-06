@@ -156,8 +156,25 @@ def parse_telegram(parsedstring):
             "Mereni: " + increment + "  Senzor: " + sensor_manu + "." + sensor_type + "." + sensor_sn + "." + sensor_ver + "    RSSI: " + rssi + "dB     AES: " + str(
                 aes).ljust(5, ' ') + "   Průtok: " + counter.rjust(7, ' ') + "l    Cas: " + cascteni + errors)
     elif (sensor_manu == "KAM"):
-        output("KAMSTRUP structure is not implemented yet :(")
-        # !!! tady pokracujeme strukturou pro Kamstrup.....
+        #DobaBehu = int(LSB(parsedstring[42:50]),16)
+        #Prurez1 = int(LSB(parsedstring[54:62]), 16)
+        Prutok = str(int(LSB(parsedstring[66:74]), 16))
+        # RozsirujiciChyby print(parsedstring[80:84])
+        Teplota1 = str(int(LSB(parsedstring[88:92]), 16)/100)
+        DatumCas1 = get_date(LSB(parsedstring[96:100]))
+        DatumCas2 = get_date(LSB(parsedstring[104:108]))
+        #Prurez2 = int(LSB(parsedstring[112:120]), 16)
+        Energie1 = str(int(LSB(parsedstring[124:132]), 16)*10)
+        Teplota2 = str(int(LSB(parsedstring[136:140]), 16)/100)
+        #KamstupSpecific print(parsedstring[146:154])
+        #KamstrupSpecific print(parsedstring[158:166])
+        Energie2 = str(int(LSB(parsedstring[172:180]), 16)*10)
+        # KAMSTRUP aktualne neukladame z duvodu dlouhodobeho rizeneho neotestovani
+        # sql("INSERT INTO MEASURES (DATETIME,DEVICE,RSSI,TYPE1,VALUE1,TYPE2,VALUE2) VALUES ('" + time.strftime("%Y-%m-%d %H:%M") + "', '" + device + "', '" + rssi + "', 'Wh', '" + value1 + "','Wh','"+value2+"')")
+        output(
+            "Mereni: " + increment + "  Senzor: " + sensor_manu + "." + sensor_type + "." + sensor_sn + "." + sensor_ver + "    RSSI: " + rssi + "dB     AES: " + str(
+                aes).ljust(5, ' ') + "   Teplota: " + Teplota1 +"/"+ Teplota2 + "°C   Energie: " + Energie1 + "/" + Energie2 + "MJ  Prutok: " + Prutok +"m3/hod")
+
     elif (sensor_manu == "ZPA"):
         value1 = parsedstring[58:70]
         value2 = parsedstring[78:88]
@@ -173,6 +190,15 @@ def parse_telegram(parsedstring):
                 aes).ljust(5, ' ') + "   Telegram structure not supported. " + errors)
     return
 
+
+############################ Vypocitani data ve formatu F ##############################################################
+def get_date(date_bytes):
+    date = str(bin(int(date_bytes[0:2], 16))[2:]).zfill(8) + str(bin(int(date_bytes[2:4], 16))[2:]).zfill(8)
+    year = str(int(date[0:4]+date[8:11], 2))
+    month = str(int(date[4:8], 2))
+    day = str(int(date[11:16], 2))
+    vysledek = day + "." + month + ".20" + year
+    return vysledek
 
 ############### Vypocitani VendorID z M-Pole ###########################################################################
 def get_vendor_name(vendor_input):

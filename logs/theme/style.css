@@ -82,14 +82,19 @@ th {
 }
 /* 2nd Column: Filename */
 th + th {
-	width:65%;
+	width:15%;
 }
 /* 3rd Column: Last Modified */
 th + th + th {
+width:15%;
 }
 /* 4th Column: Size */
 th + th + th + th {
-	width:5%;
+	width:10%;
+}
+/* 4th Column: Size */
+th + th + th + th + th{
+	width:55%;
 }
 tr td:first-of-type {
 	padding-left:10px;

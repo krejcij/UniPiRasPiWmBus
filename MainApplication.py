@@ -2,11 +2,13 @@
 # -*- coding: utf-8 -*-
 
 ############## Naimportime potrebne knihovny ###########################################################################
+from __future__ import division
 import binascii
 import time
 import sys
 import getopt
 global demo_run
+
 
 ############## Provedeme zakladni nastaveni ############################################################################
 global AES_IQRF_DEFAULT
@@ -41,34 +43,22 @@ except NameError:
 try:
     global file
     file = open(LOGS_DIR + "ALL.txt", "a")
-    file.write(
-        bytearray("########################   " + time.strftime("%d/%m/%Y  %H:%M:%S") + "   ########################\n",
-                  'UTF-8'))
+    file.write(bytearray("########################   " + time.strftime("%d/%m/%Y  %H:%M:%S") + "   ########################\n", 'UTF-8'))
     global fsql
     fsql = open(LOGS_DIR + "SQL.txt", "a")
-    fsql.write(
-        bytearray("########################   " + time.strftime("%d/%m/%Y  %H:%M:%S") + "   ########################\n",
-                  'UTF-8'))
+    fsql.write(bytearray("########################   " + time.strftime("%d/%m/%Y  %H:%M:%S") + "   ########################\n",'UTF-8'))
     global ferr
     ferr = open(LOGS_DIR + "ERR.txt", "a")
-    ferr.write(
-        bytearray("########################   " + time.strftime("%d/%m/%Y  %H:%M:%S") + "   ########################\n",
-                  'UTF-8'))
+    ferr.write( bytearray("########################   " + time.strftime("%d/%m/%Y  %H:%M:%S") + "   ########################\n",'UTF-8'))
     global fcap
     fcap = open(LOGS_DIR + "CAP.txt", "a")
-    fcap.write(
-        bytearray("########################   " + time.strftime("%d/%m/%Y  %H:%M:%S") + "   ########################\n",
-                  'UTF-8'))
+    fcap.write(bytearray("########################   " + time.strftime("%d/%m/%Y  %H:%M:%S") + "   ########################\n", 'UTF-8'))
     global fpar
     fpar = open(LOGS_DIR + "PAR.txt", "a")
-    fpar.write(
-        bytearray("########################   " + time.strftime("%d/%m/%Y  %H:%M:%S") + "   ########################\n",
-                  'UTF-8'))
+    fpar.write(bytearray("########################   " + time.strftime("%d/%m/%Y  %H:%M:%S") + "   ########################\n",'UTF-8'))
     global fscr
     fscr = open(LOGS_DIR + "SCR.txt", "a")
-    fscr.write(
-        bytearray("########################   " + time.strftime("%d/%m/%Y  %H:%M:%S") + "   ########################\n",
-                  'UTF-8'))
+    fscr.write(bytearray("########################   " + time.strftime("%d/%m/%Y  %H:%M:%S") + "   ########################\n",'UTF-8'))
 except NameError:
     print("ERROR: Log files cannot be created.")
     exit(1)
@@ -94,22 +84,24 @@ def sql(query):
 
 ############ Obecny vystup #############################################################################################
 def output(dest, output):
-    file.write(bytearray(time.strftime("%d/%m/%Y  %H:%M:%S  ") + dest + "  " + output + "\n", 'UTF-8'))
+    #file.write(bytearray(time.strftime("%d/%m/%Y  %H:%M:%S  ") + dest + "  " + output + "\n", 'UTF-8'))
     if (dest == 'SCR'):
-        fscr.write(bytearray(time.strftime("%d/%m/%Y  %H:%M:%S  ") + output + "\n", 'UTF-8'))
+        #fscr.write(bytearray(time.strftime("%d/%m/%Y  %H:%M:%S  ") + output + "\n", 'UTF-8'))
         print(time.strftime("%d/%m/%Y  %H:%M:%S  ") + output)
     elif (dest == 'ERR'):
-        ferr.write(bytearray(time.strftime("%d/%m/%Y  %H:%M:%S  ") + output + "\n", 'UTF-8'))
+        #ferr.write(bytearray(time.strftime("%d/%m/%Y  %H:%M:%S  ") + output + "\n", 'UTF-8'))
+        #fscr.write(bytearray(time.strftime("%d/%m/%Y  %H:%M:%S  ") + output + "\n", 'UTF-8'))
         print(time.strftime("%d/%m/%Y  %H:%M:%S  ") + "ERROR: " + output)
     elif (dest == 'PAR'):
-        fpar.write(bytearray(time.strftime("%d/%m/%Y  %H:%M:%S  ") + output + "\n", 'UTF-8'))
+        #fpar.write(bytearray(time.strftime("%d/%m/%Y  %H:%M:%S  ") + output + "\n", 'UTF-8'))
+        #fscr.write(bytearray(time.strftime("%d/%m/%Y  %H:%M:%S  ") + output + "\n", 'UTF-8'))
         print(time.strftime("%d/%m/%Y  %H:%M:%S  ") + output)
     elif (dest == 'SQL'):
         pass
-        fsql.write(bytearray(time.strftime("%d/%m/%Y  %H:%M:%S  ") + output + "\n", 'UTF-8'))
+        #fsql.write(bytearray(time.strftime("%d/%m/%Y  %H:%M:%S  ") + output + "\n", 'UTF-8'))
     elif (dest == 'CAP'):
         pass
-        fcap.write(bytearray(time.strftime("%d/%m/%Y  %H:%M:%S  ") + output + "\n", 'UTF-8'))
+        #fcap.write(bytearray(time.strftime("%d/%m/%Y  %H:%M:%S  ") + output + "\n", 'UTF-8'))
     else:
         pass
     return
@@ -127,25 +119,23 @@ def parse_telegram(parsedstring, RunType):
 
     increment = str(int(parsedstring[26:28], 16)).rjust(3, ' ')
     access = str(parsedstring[26:28])
-    rssi = get_signal_value(parsedstring[-4:-2])
+    rssi = get_signal_value(parsedstring[-4:-2]).rjust(3, ' ')
 
     ############ Rozsifrujeme zasifrovany telegram #####################################################################
     configuration_field = parsedstring[33:34]
     if (configuration_field == '5'):
         aes = True
         AES_KEY_IQRF = binascii.unhexlify(AES_IQRF_DEFAULT)
-        # sql("INSERT INTO TELEGRAMS (DATETIME,PRE,HEADER,DATA,POST,AESKEY) VALUES ('"+time.strftime("%Y-%m-%d %H:%M")+"', '"+parsedstring[0:4]+"', '"+parsedstring[4:34]+"', '"+parsedstring[34:-4]+"', '"+parsedstring[-4:]+"','"+AES_IQRF_DEFAULT+"')")
+        sql("INSERT INTO TELEGRAMS (DATETIME,PRE,HEADER,DATA,POST,AESKEY) VALUES ('"+time.strftime("%Y-%m-%d %H:%M")+"', '"+parsedstring[0:4]+"', '"+parsedstring[4:34]+"', '"+parsedstring[34:-4]+"', '"+parsedstring[-4:]+"','"+AES_IQRF_DEFAULT+"')")
 
         ### Nacti sifrovanou cast dat z prichoziho paketu ##############################################################
         TELEGRAM_DECRYPTED = binascii.unhexlify(parsedstring[34:-4])
         if (len(TELEGRAM_DECRYPTED) % 16 != 0):
-            print("ERROR: Chyba pri prijmu telegramu")
-            print(binascii.hexlify(TELEGRAM_DECRYPTED))
+            output('ERR', bytearray("ERROR: Exception with receiving telegram ", 'UTF-8') + binascii.hexlify(TELEGRAM_DECRYPTED))
             return
 
         ### Nacti prislusny sifrovaci klic daneho zarizeni z DB ########################################################
-        vysledky = db.execute(
-            "SELECT `DEVICE_AES` FROM `DEVICES` WHERE `DEVICE_ADDRESS` LIKE '%" + device + "%' LIMIT 1;")
+        vysledky = db.execute("SELECT `DEVICE_AES` FROM `DEVICES` WHERE `DEVICE_ADDRESS` LIKE '%" + device + "%' LIMIT 1;")
         vysledek = vysledky.fetchone()
         AES_KEY_DEVICE = binascii.unhexlify(vysledek[0])
 
@@ -164,6 +154,7 @@ def parse_telegram(parsedstring, RunType):
                 output('ERR', bytearray("    AES_KEY_DEVICE:      ", 'UTF-8') + binascii.hexlify(AES_KEY_DEVICE))
                 output('ERR', bytearray("    AES_TEL_DECRYPTED:   ", 'UTF-8') + binascii.hexlify(TELEGRAM_DECRYPTED))
                 output('ERR', bytearray("    AES_TEL_CRYPTED:     ", 'UTF-8') + binascii.hexlify(TELEGRAM_CRYPTED))
+                return
         else:
             TELEGRAM_CRYPTED = TELEGRAM_DECRYPTED
 
@@ -179,6 +170,7 @@ def parse_telegram(parsedstring, RunType):
             output('ERR', bytearray("    AES_TEL_DECRYPTED:   ", 'UTF-8') + binascii.hexlify(TELEGRAM_DECRYPTED))
             output('ERR', bytearray("    AES_TEL_CRYPTED:     ", 'UTF-8') + binascii.hexlify(TELEGRAM_CRYPTED))
             output('ERR', bytearray("    AES_TEL_ORIGINAL:     ", 'UTF-8') + binascii.hexlify(TELEGRAM_ORIGINAL))
+            return
 
         aes_control = binascii.hexlify(TELEGRAM_ORIGINAL[0:2]).upper()
         if (aes_control != b'2F2F'):
@@ -194,35 +186,20 @@ def parse_telegram(parsedstring, RunType):
                 binascii.hexlify(TELEGRAM_ORIGINAL).upper().decode('ascii')) + parsedstring[-4:]
     else:
         aes = False
-        # sql("INSERT INTO TELEGRAMS (DATETIME,PRE,HEADER,DATA,POST,AESKEY) VALUES ('"+time.strftime("%Y-%m-%d %H:%M")+"', '"+parsedstring[0:4]+"', '"+parsedstring[4:34]+"', '"+parsedstring[34:-4]+"', '"+parsedstring[-4:]+"','-')")
+        sql("INSERT INTO TELEGRAMS (DATETIME,PRE,HEADER,DATA,POST,AESKEY) VALUES ('"+time.strftime("%Y-%m-%d %H:%M")+"', '"+parsedstring[0:4]+"', '"+parsedstring[4:34]+"', '"+parsedstring[34:-4]+"', '"+parsedstring[-4:]+"','-')")
 
     ############ Vyparsujeme potrebne informace ########################################################################
     if (sensor_manu == "WEP"):
         if parsedstring[66:68] == "01": errors = "Battery dead"
-        temperature = parsedstring[44:45].replace("0", "") + parsedstring[45:46].replace("0", "") + parsedstring[
-                                                                                                    42:43] + "." + parsedstring[
-                                                                                                                   43:44]
-        humidity = parsedstring[54:55].replace("0", "") + parsedstring[55:56].replace("0", "") + parsedstring[
-                                                                                                 52:53] + "." + parsedstring[
-                                                                                                                53:54]
-        sql("INSERT INTO MEASURES (DATETIME,DEVICE,RSSI,TYPE1,VALUE1,TYPE2,VALUE2) VALUES ('" + time.strftime(
-            "%Y-%m-%d %H:%M") + "', '" + device + "', '" + rssi + "', 'C', '" + temperature + "','%','" + humidity + "')")
-        output('PAR',
-               "AccNo: " + increment + "  Device: " + sensor_manu + "." + sensor_type + "." + sensor_sn + "." + sensor_ver + "    RSSI: " + rssi + "dB     AES: " + str(
-                   aes).ljust(5, ' ') + "   Temperature: " + temperature.rjust(5,
-                                                                               ' ') + "C    Humidity: " + humidity.rjust(
-                   5,
-                   ' ') + "%     " + errors)
+        temperature = str(int(LSB(parsedstring[42:46])) / 10)
+        humidity = str(int(LSB(parsedstring[52:56])) / 10)
+        sql("INSERT INTO MEASURES (DATETIME,DEVICE,RSSI,TYPE1,VALUE1,TYPE2,VALUE2) VALUES ('" + time.strftime("%Y-%m-%d %H:%M") + "', '" + device + "', '" + rssi + "', 'C', '" + temperature + "','%','" + humidity + "')")
+        output('PAR', "AccNo: " + increment + "  Device: " + sensor_manu + "." + sensor_type + "." + sensor_sn + "." + sensor_ver + "  RSSI: " + rssi + "dB  AES: " + str(aes).ljust(5, ' ') + "  Temperature: " + temperature.rjust(4,' ') + "C  Humidity: " + humidity.rjust(4, ' ') + "%  " + errors)
     elif (sensor_manu == "BON"):
         Spotreba = str(int(LSB(parsedstring[42:46]), 16))
         Cascteni = get_date(LSB(parsedstring[58:62])) + " " + get_time(LSB(parsedstring[54:58]))
-
-        sql("INSERT INTO MEASURES (DATETIME,DEVICE,RSSI,TYPE1,VALUE1,TYPE2,VALUE2) VALUES ('" + time.strftime(
-            "%Y-%m-%d %H:%M") + "', '" + device + "', '" + rssi + "', 'l', '" + Spotreba + "','Count','" + Cascteni + "')")
-        output('PAR',
-               "Mereni: " + increment + "  Device: " + sensor_manu + "." + sensor_type + "." + sensor_sn + "." + sensor_ver + "    RSSI: " + rssi + "dB     AES: " + str(
-                   aes).ljust(5, ' ') + "   Spotreba: " + Spotreba.rjust(7,
-                                                                         ' ') + "l    DateTime: " + Cascteni + errors)
+        sql("INSERT INTO MEASURES (DATETIME,DEVICE,RSSI,TYPE1,VALUE1,TYPE2,VALUE2) VALUES ('" + time.strftime("%Y-%m-%d %H:%M") + "', '" + device + "', '" + rssi + "', 'l', '" + Spotreba + "','Readout','" + Cascteni + "')")
+        output('PAR',"AccNo: " + increment + "  Device: " + sensor_manu + "." + sensor_type + "." + sensor_sn + "." + sensor_ver + "  RSSI: " + rssi + "dB  AES: " + str(aes).ljust(5, ' ') + "  Volume: " + Spotreba + "l  ReadOut: " + Cascteni + "  " +errors)
     elif (sensor_manu == "KAM"):
         # DobaBehu = int(LSB(parsedstring[42:50]),16)
         # Prurez1 = int(LSB(parsedstring[54:62]), 16)
@@ -233,27 +210,16 @@ def parse_telegram(parsedstring, RunType):
         Teplota2 = str(int(LSB(parsedstring[136:140]), 16) / 100)
         Energie2 = str(int(LSB(parsedstring[172:180]), 16) * 10)
         # sql("INSERT INTO MEASURES (DATETIME,DEVICE,RSSI,TYPE1,VALUE1,TYPE2,VALUE2) VALUES ('" + time.strftime("%Y-%m-%d %H:%M") + "', '" + device + "', '" + rssi + "', 'Wh', '" + value1 + "','Wh','"+value2+"')")
-        output('PAR',
-               "Mereni: " + increment + "  Senzor: " + sensor_manu + "." + sensor_type + "." + sensor_sn + "." + sensor_ver + "    RSSI: " + rssi + "dB     AES: " + str(
-                   aes).ljust(5,
-                              ' ') + "   Teplota: " + Teplota1 + "/" + Teplota2 + "C   Energie: " + Energie1 + "/" + Energie2 + "MJ  Prutok: " + Prutok + "m3/hod" + errors)
-
+        output('PAR',"AccNo: " + increment + "  Device: " + sensor_manu + "." + sensor_type + "." + sensor_sn + "." + sensor_ver + "  RSSI: " + rssi + "dB  AES: " + str(aes).ljust(5, ' ') + "  Temperature: " + Teplota1 + "/" + Teplota2 + "C  Energy: " + Energie1 + "/" + Energie2 + "MJ  Flow: " + Prutok + "m3/h  " + errors)
     elif (sensor_manu == "ZPA"):
         Spotreba1 = str(int(LSB(parsedstring[58:70]), 16) / 1000)
         Spotreba2 = str(int(LSB(parsedstring[78:88]), 16) / 1000)
-        sql("INSERT INTO MEASURES (DATETIME,DEVICE,RSSI,TYPE1,VALUE1,TYPE2,VALUE2) VALUES ('" + time.strftime(
-            "%Y-%m-%d %H:%M") + "', '" + device + "', '" + rssi + "', 'kWh', '" + Spotreba1 + "','kWh','" + Spotreba2 + "')")
-        output('PAR',
-               "Mereni: " + increment + "  Senzor: " + sensor_manu + "." + sensor_type + "." + sensor_sn + "." + sensor_ver + "    RSSI: " + rssi + "dB     AES: " + str(
-                   aes).ljust(5,
-                              ' ') + "   Spotreba T1: " + Spotreba1 + "kWh   Spotreba T2: " + Spotreba2 + "kWh" + errors)
+        sql("INSERT INTO MEASURES (DATETIME,DEVICE,RSSI,TYPE1,VALUE1,TYPE2,VALUE2) VALUES ('" + time.strftime("%Y-%m-%d %H:%M") + "', '" + device + "', '" + rssi + "', 'kWh', '" + Spotreba1 + "','kWh','" + Spotreba2 + "')")
+        output('PAR',"AccNo: " + increment + "  Device: " + sensor_manu + "." + sensor_type + "." + sensor_sn + "." + sensor_ver + "  RSSI: " + rssi + "dB  AES: " + str(aes).ljust(5, ' ') + "  Tariff1: " + Spotreba1 + "kWh  Tariff2: " + Spotreba2 + "kWh  " + errors)
     else:
-        output('PAR',
-               "Mereni: " + increment + "  Senzor: " + sensor_manu + "." + sensor_type + "." + sensor_sn + "." + sensor_ver + "    RSSI: " + rssi + "dB     AES: " + str(
-                   aes).ljust(5, ' ') + "   Telegram structure not supported. " + errors)
+        output('PAR', "AccNo: " + increment + "  Device: " + sensor_manu + "." + sensor_type + "." + sensor_sn + "." + sensor_ver + "  RSSI: " + rssi + "dB  AES: " + str(aes).ljust(5, ' ') + "  Telegram structure not supported. " + errors)
         output('ERR', "Telegram structure not supported: " + str(parsedstring))
     return
-
 
 ############################ Vypocitani data ve formatu G ##############################################################
 def get_date(date_bytes):
@@ -309,42 +275,30 @@ def get_demo_telegrams(demo_type):
         words.append("22001E44EE092101000001067AEF001005FDC98128F488C529F8F0A2CB9EE25EF81234")  # ME
         words.append("22001E44EE092101000001077AF0001005CB79F8422323895DA8C0FA7185B9B80B1234")  # ME
         # WEPTECH AES
-        words.append(
-            "32002E44B05C10000000021B7A0618200517BEC2259D319C81004EC1C65366CF3FAACD81C07774C950761CEC51AE26E2751234")  # ME
-        words.append(
-            "32002E44B05C10000000021B7A0818200540BC9C5672277EFD30E7508479CBE9215D6AA469F53B42A5DB3AB6F120F2205D1234")  # ME
-        words.append(
-            "32002E44B05C10000000021B7A08182005C2D901432A0617F274AFB0CAE42A0A6377F70AE1BB52C6A57301B49AC72CFAE41234")  # ME
-        words.append(
-            "32002E44B05C10000000021B7A0A182005F9031AF7B93B04732C332EF55D20A3C7B5303F461486A8FC87AE4982A857BA751234")  # ME
-        words.append(
-            "32002E44B05C10000000021B7A0A1820050717C71E23B30C799B0E16ABFCDAD6A84487B368D58226382529656F0495BE961234")  # ME
+        words.append("32002E44B05C10000000021B7A0618200517BEC2259D319C81004EC1C65366CF3FAACD81C07774C950761CEC51AE26E2751234")  # ME
+        words.append("32002E44B05C10000000021B7A0818200540BC9C5672277EFD30E7508479CBE9215D6AA469F53B42A5DB3AB6F120F2205D1234")  # ME
+        words.append("32002E44B05C10000000021B7A08182005C2D901432A0617F274AFB0CAE42A0A6377F70AE1BB52C6A57301B49AC72CFAE41234")  # ME
+        words.append("32002E44B05C10000000021B7A0A182005F9031AF7B93B04732C332EF55D20A3C7B5303F461486A8FC87AE4982A857BA751234")  # ME
+        words.append("32002E44B05C10000000021B7A0A1820050717C71E23B30C799B0E16ABFCDAD6A84487B368D58226382529656F0495BE961234")  # ME
     elif (demo_type == "aes_clean"):
         # BONEGA AES
         words.append("22001E44EE092101000001077A4F0010051AB94C4FDA694309E347E86FA437790C1234")  # ME
         words.append("22001E44EE092101000001067A4F0010051AB94C4FDA694309E347E86FA437790C6ED5")  # KZ
         # KAMSTRUP AES
-        words.append(
-            "00005E442D2C9643636013047AD210500584535BEF5623858243FF4961635B6D30017FE12743EEC8D5757B0A3EC5E0BB052ABDBF71A75179A1340D01389E144F861F56780A3F8E1543E2368676A7BDC26214D2330757F0684421A3D5B1E4C781B84231")  # AH
+        words.append("00005E442D2C9643636013047AD210500584535BEF5623858243FF4961635B6D30017FE12743EEC8D5757B0A3EC5E0BB052ABDBF71A75179A1340D01389E144F861F56780A3F8E1543E2368676A7BDC26214D2330757F0684421A3D5B1E4C781B84231")  # AH
     elif (demo_type == "clean"):
         # BONEGA
         words.append("22001E44EE092101000001067A4F0010002F2F04131A220000046D0328C4162F2F6ED5")  # ME
         words.append("22001E44EE092101000001077A4F0010002F2F04131A220000046D0328C4162F2F6ED5")  # ME
         # WEPTECH
-        words.append(
-            "32002E44B05C11000000021B7A920800002F2F0A6667020AFB1A560402FD971D01002F2F2F2F2F2F2F2F2F2F2F2F2F2F2F1234")  # KZ
-        words.append(
-            "32002e44b05c10000000021b7a660800002f2f0a6690010afb1a090302fd971d01002f2f2f2f2f2f2f2f2f2f2f2f2f2f2f8769")  # ME
+        words.append("32002E44B05C11000000021B7A920800002F2F0A6667020AFB1A560402FD971D01002F2F2F2F2F2F2F2F2F2F2F2F2F2F2F1234")  # KZ
+        words.append("32002e44b05c10000000021b7a660800002f2f0a6690010afb1a090302fd971d01002f2f2f2f2f2f2f2f2f2f2f2f2f2f2f8769")  # ME
         # KAMSTUP
-        words.append(
-            "00005E442D2C9643636013047AD21000002F2F0422BA11000004140F000000043B0000000002FD1700100259A50A026CB316426CBF1544140F000000040F02000000025DAF0A04FF070600000004FF0802000000440F020000002F2F2F2F2F2F2F1234")  # AH
+        words.append("00005E442D2C9643636013047AD21000002F2F0422BA11000004140F000000043B0000000002FD1700100259A50A026CB316426CBF1544140F000000040F02000000025DAF0A04FF070600000004FF0802000000440F020000002F2F2F2F2F2F2F1234")  # AH
         # ZPA
-        words.append(
-            "00002A44016A4493671201027244936712016A01020000002086108300762385010000862083009731920000001234")  # KZ
-        words.append(
-            "00002A44016A4742750101027247427501016A01020000002086108300B80B0000000086208300F82A000000009658")  # PM
-        words.append(
-            "2e002a44016a4742750101027247427501016a01021b00002086108300b80b0000000086208300f82a000000008cd4")  # JA
+        words.append("00002A44016A4493671201027244936712016A01020000002086108300762385010000862083009731920000001234")  # KZ
+        words.append("00002A44016A4742750101027247427501016A01020000002086108300B80B0000000086208300F82A000000009658")  # PM
+        words.append("2e002a44016a4742750101027247427501016a01021b00002086108300b80b0000000086208300f82a000000008cd4")  # JA
     return words
 
 
@@ -352,8 +306,7 @@ def get_demo_telegrams(demo_type):
 def get_signal_value(sensor_rssi):
     sensor_rssi = int(sensor_rssi, 16)
     sensor_rssi = (sensor_rssi / 2) - 130
-    return str(sensor_rssi).rjust(6, ' ')
-
+    return str(sensor_rssi)
 
 ########################################################################################################################
 ########################################################################################################################
@@ -410,16 +363,21 @@ else:
     output("SCR", "Sniffing now:")
 
     while True:
-        readedstring = ''
-        readedstring = ser.read(200)
-        readedstring = binascii.hexlify(readedstring)
-        readedstring = str(readedstring)
-
-        if readedstring:
-            try:
-                parse_telegram(readedstring, args[0])
-            except IndexError:
-                parse_telegram(readedstring, 'normal')
+        try:
+            readedstring = ''
+            readedstring = ser.read(200)
+            readedstring = binascii.hexlify(readedstring)
+            readedstring = str(readedstring)
+    
+            if readedstring:
+                try:
+                    parse_telegram(readedstring, args[0])
+                except IndexError:
+                    parse_telegram(readedstring, 'normal')
+        except KeyboardInterrupt:
+            output("SCR", ".... sniffing ended.")
+            break
+            
 
 ############ Ukoncime hrani ############################################################################################
 try:

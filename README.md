@@ -2,7 +2,7 @@
 
 ### How to use
 
-Skript can be run in Python interpreter:
+Script have to be run in Python interpreter:
 + General usage of the script: **python MainApplication.py**
 + Demo mode for encrypted packets from IQRF: *python MainApplication.py aes_iqrf*
 + Demo mode for general encrypted packets: *python MainApplication.py aes_clean*
@@ -11,8 +11,3 @@ Skript can be run in Python interpreter:
 ### Example
 
 ![Screen](./MainExample.png)
-
-### Wishlist
-+ Create data visualisation
-+ Create rapsi apache website
-+ Run this app as a service

@@ -7,18 +7,25 @@ apt-get upgrade -y
 apt-get dist-upgrade -y
 
 # Nastavit konfiguraky
-    # enable-uart
+    # enable-uart=1
     # console=tty
     # dt-overlay=pi3
-    # povolit ssh
     
 # Nainstalit balicky
-apt-get install python-dev python-crypto sqlite3 apache2 git mc python-serial php -y
+apt-get install python-dev python-crypto python-serial sqlite3 apache2 php libapache2-mod-php git mc htop -y
 
-# Stahnout dvakrat repozitar
-    # Nastavit prava na spousteni skriptu
-    # Nastavit prava pro zapis souboru
-    # Vytvorit symlink do BINu
-    # Vytvorit symlinky pro logy a db
+# Stahnout repozitar aplikace
+git clone https://github.com/krejcij/UniPiRasPiWmBus.git /var/www/html.
 
-     
+# Nastavit prava na spousteni skriptu
+chmod +x /var/www/html/MainProgram.sh
+
+# Nastavit prava pro zapis souboru
+chmod +w /var/www/html/logs
+
+# Vytvorit symlink do BINu
+ln -s /var/www/html/MainProgram.sh /usr/bin/
+  
+# Nastavit spousteni po startu systemu
+ln -s /var/www/html/MainProgram.sh /etc/rc.d/
+ln -s /var/www/html/MainProgram.sh /etc/init.d/

@@ -1,0 +1,4 @@
+Options -Indexes +FollowSymlinks
+RewriteEngine on
+RewriteRule ^db http://%{SERVER_NAME}/sqlite-viewer/?url=http://%{SERVER_NAME}/MainDatabase.db
+RewriteRule ^db/ http://%{SERVER_NAME}/sqlite-viewer/?url=http://%{SERVER_NAME}/MainDatabase.db

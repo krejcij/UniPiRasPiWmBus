@@ -49,7 +49,7 @@ try:
     fsql.write(bytearray("########################   " + time.strftime("%d/%m/%Y  %H:%M:%S") + "   ########################\n",'UTF-8'))
     global ferr
     ferr = open(LOGS_DIR + "ERR.txt", "a")
-    ferr.write( bytearray("########################   " + time.strftime("%d/%m/%Y  %H:%M:%S") + "   ########################\n",'UTF-8'))
+    ferr.write(bytearray("########################   " + time.strftime("%d/%m/%Y  %H:%M:%S") + "   ########################\n",'UTF-8'))
     global fcap
     fcap = open(LOGS_DIR + "CAP.txt", "a")
     fcap.write(bytearray("########################   " + time.strftime("%d/%m/%Y  %H:%M:%S") + "   ########################\n", 'UTF-8'))
@@ -85,23 +85,24 @@ def sql(query):
 ############ Obecny vystup #############################################################################################
 def output(dest, output):
     #file.write(bytearray(time.strftime("%d/%m/%Y  %H:%M:%S  ") + dest + "  " + output + "\n", 'UTF-8'))
+    file.write(time.strftime("%d/%m/%Y  %H:%M:%S  ") + dest + "  " + output + "\n")
     if (dest == 'SCR'):
-        #fscr.write(bytearray(time.strftime("%d/%m/%Y  %H:%M:%S  ") + output + "\n", 'UTF-8'))
+        fscr.write(bytearray(time.strftime("%d/%m/%Y  %H:%M:%S  ") + output + "\n", 'UTF-8'))
         print(time.strftime("%d/%m/%Y  %H:%M:%S  ") + output)
     elif (dest == 'ERR'):
-        #ferr.write(bytearray(time.strftime("%d/%m/%Y  %H:%M:%S  ") + output + "\n", 'UTF-8'))
-        #fscr.write(bytearray(time.strftime("%d/%m/%Y  %H:%M:%S  ") + output + "\n", 'UTF-8'))
+        ferr.write(time.strftime("%d/%m/%Y  %H:%M:%S  ") + output + "\n")
+        fscr.write(time.strftime("%d/%m/%Y  %H:%M:%S  ") + output + "\n")
         print(time.strftime("%d/%m/%Y  %H:%M:%S  ") + "ERROR: " + output)
     elif (dest == 'PAR'):
-        #fpar.write(bytearray(time.strftime("%d/%m/%Y  %H:%M:%S  ") + output + "\n", 'UTF-8'))
-        #fscr.write(bytearray(time.strftime("%d/%m/%Y  %H:%M:%S  ") + output + "\n", 'UTF-8'))
+        fpar.write(bytearray(time.strftime("%d/%m/%Y  %H:%M:%S  ") + output + "\n", 'UTF-8'))
+        fscr.write(bytearray(time.strftime("%d/%m/%Y  %H:%M:%S  ") + output + "\n", 'UTF-8'))
         print(time.strftime("%d/%m/%Y  %H:%M:%S  ") + output)
     elif (dest == 'SQL'):
         pass
-        #fsql.write(bytearray(time.strftime("%d/%m/%Y  %H:%M:%S  ") + output + "\n", 'UTF-8'))
+        fsql.write(bytearray(time.strftime("%d/%m/%Y  %H:%M:%S  ") + output + "\n", 'UTF-8'))
     elif (dest == 'CAP'):
         pass
-        #fcap.write(bytearray(time.strftime("%d/%m/%Y  %H:%M:%S  ") + output + "\n", 'UTF-8'))
+        fcap.write(bytearray(time.strftime("%d/%m/%Y  %H:%M:%S  ") + output + "\n", 'UTF-8'))
     else:
         pass
     return

@@ -67,3 +67,11 @@ DefaultIcon theme/icons/default.png
 HeaderName theme/header.html
 ReadmeName theme/footer.html
 IndexStyleSheet theme/style.css
+
+# DESCRIPTION FILES
+AddDescription "Log with complete informations" ALL.txt
+AddDescription "Log with captured packets" CAP.txt
+AddDescription "Log with errors" ERR.txt
+AddDescription "Log with parsed values" PAR.txt
+AddDescription "Log of the application screen" SCR.txt
+AddDescription "Log with sql queries" SQL.txt 

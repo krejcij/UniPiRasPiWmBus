@@ -1,5 +1,13 @@
+@import url('//fonts.googleapis.com/css?family=Open+Sans');
+html {
+	font-family:'Open Sans', sans-serif;
+    line-height:2em;
+}
+
 body {
     background: #f5f5f5;
+    margin: 0;
+    padding: 0;
 }
 
 footer {
@@ -16,8 +24,8 @@ footer small a {
 #main-container {
     position: relative;
     background: #ffffff;
-    box-shadow: 0 1px 16px silver;
-    z-index: 2;
+    box-shadow: 0 0 16px silver;
+    z-index: 8;
 }
 
 .node-info {

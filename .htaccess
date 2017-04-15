@@ -1,4 +1,7 @@
 Options -Indexes +FollowSymlinks
 RewriteEngine on
+DirectoryIndex index.php index.html index.htm app.php MainVisualisation.php
 RewriteRule ^db http://%{SERVER_NAME}/sqlite-viewer/?url=http://%{SERVER_NAME}/MainDatabase.db
 RewriteRule ^db/ http://%{SERVER_NAME}/sqlite-viewer/?url=http://%{SERVER_NAME}/MainDatabase.db
+RewriteRule ^info http://%{SERVER_NAME}/
+RewriteRule ^info/ http://%{SERVER_NAME}/
